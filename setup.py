@@ -5,7 +5,7 @@ version = '0.1.dev0'
 
 entry_points = {
     'openprocurement.auctions.core.plugins': [
-        'auctions.insider = openprocurement.auctions.insider:includeme'
+        'auctions.insider = openprocurement.auctions.insider.includeme:includeme'
     ]
 }
 
@@ -23,7 +23,7 @@ docs_requires = requires + [
     'sphinxcontrib-httpdomain',
 ]
 
-setup(name='openprocurement.auctions.dutch',
+setup(name='openprocurement.auctions.insider',
       version=version,
       description="",
       long_description=open("README.rst").read() + "\n" +
