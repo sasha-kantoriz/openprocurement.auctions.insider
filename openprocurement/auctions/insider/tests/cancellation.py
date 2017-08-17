@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from openprocurement.auctions.insider.tests.base import BaseAuctionWebTest, test_lots, test_bids, test_financial_auction_data, test_financial_bids
+from openprocurement.auctions.insider.tests.base import (
+    BaseInsiderAuctionWebTest, test_financial_bids,
+    test_insider_auction_data, test_financial_organization,
+)
 
 
-class AuctionCancellationResourceTest(BaseAuctionWebTest):
+class InsiderAuctionCancellationResourceTest(BaseInsiderAuctionWebTest):
     initial_status = 'active.tendering'
-    initial_bids = test_bids
+    initial_bids = test_financial_bids
 
     def test_create_auction_cancellation_invalid(self):
         response = self.app.post_json('/auctions/some_id/cancellations', {
@@ -235,186 +238,10 @@ class AuctionCancellationResourceTest(BaseAuctionWebTest):
         ])
 
 
-@unittest.skip("option not available")
-class AuctionLotCancellationResourceTest(BaseAuctionWebTest):
-    initial_status = 'active.tendering'
-    initial_lots = test_lots
-    initial_bids = test_bids
-
-    def test_create_auction_cancellation(self):
-        lot_id = self.initial_lots[0]['id']
-        response = self.app.post_json('/auctions/{}/cancellations'.format(self.auction_id), {'data': {
-            'reason': 'cancellation reason',
-            "cancellationOf": "lot",
-            "relatedLot": lot_id
-        }})
-        self.assertEqual(response.status, '201 Created')
-        self.assertEqual(response.content_type, 'application/json')
-        cancellation = response.json['data']
-        self.assertEqual(cancellation['reason'], 'cancellation reason')
-        self.assertIn('id', cancellation)
-        self.assertIn(cancellation['id'], response.headers['Location'])
-
-        response = self.app.get('/auctions/{}'.format(self.auction_id))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']['lots'][0]["status"], 'active')
-        self.assertEqual(response.json['data']["status"], 'active.tendering')
-
-        response = self.app.post_json('/auctions/{}/cancellations'.format(self.auction_id), {'data': {
-            'reason': 'cancellation reason',
-            'status': 'active',
-            "cancellationOf": "lot",
-            "relatedLot": lot_id
-        }})
-        self.assertEqual(response.status, '201 Created')
-        self.assertEqual(response.content_type, 'application/json')
-        cancellation = response.json['data']
-        self.assertEqual(cancellation['reason'], 'cancellation reason')
-        self.assertEqual(cancellation['status'], 'active')
-        self.assertIn('id', cancellation)
-        self.assertIn(cancellation['id'], response.headers['Location'])
-
-        response = self.app.get('/auctions/{}'.format(self.auction_id))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']['lots'][0]["status"], 'cancelled')
-        self.assertEqual(response.json['data']["status"], 'cancelled')
-
-        response = self.app.post_json('/auctions/{}/cancellations'.format(
-            self.auction_id), {'data': {'reason': 'cancellation reason'}}, status=403)
-        self.assertEqual(response.status, '403 Forbidden')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Can't add cancellation in current (cancelled) auction status")
-
-    def test_patch_auction_cancellation(self):
-        lot_id = self.initial_lots[0]['id']
-        response = self.app.post_json('/auctions/{}/cancellations'.format(self.auction_id), {'data': {
-            'reason': 'cancellation reason',
-            "cancellationOf": "lot",
-            "relatedLot": lot_id
-        }})
-        self.assertEqual(response.status, '201 Created')
-        self.assertEqual(response.content_type, 'application/json')
-        cancellation = response.json['data']
-
-        response = self.app.patch_json('/auctions/{}/cancellations/{}'.format(self.auction_id, cancellation['id']), {"data": {"status": "active"}})
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["status"], "active")
-
-        response = self.app.get('/auctions/{}'.format(self.auction_id))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']['lots'][0]["status"], 'cancelled')
-        self.assertEqual(response.json['data']["status"], 'cancelled')
-
-        response = self.app.patch_json('/auctions/{}/cancellations/{}'.format(self.auction_id, cancellation['id']), {"data": {"status": "pending"}}, status=403)
-        self.assertEqual(response.status, '403 Forbidden')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Can't update cancellation in current (cancelled) auction status")
-
-        response = self.app.get('/auctions/{}/cancellations/{}'.format(self.auction_id, cancellation['id']))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["status"], "active")
-        self.assertEqual(response.json['data']["reason"], "cancellation reason")
-
-
-@unittest.skip("option not available")
-class AuctionLotsCancellationResourceTest(BaseAuctionWebTest):
-    initial_status = 'active.tendering'
-    initial_lots = 2 * test_lots
-    initial_bids = test_bids
-
-    def test_create_auction_cancellation(self):
-        lot_id = self.initial_lots[0]['id']
-        response = self.app.post_json('/auctions/{}/cancellations'.format(self.auction_id), {'data': {
-            'reason': 'cancellation reason',
-            "cancellationOf": "lot",
-            "relatedLot": lot_id
-        }})
-        self.assertEqual(response.status, '201 Created')
-        self.assertEqual(response.content_type, 'application/json')
-        cancellation = response.json['data']
-        self.assertEqual(cancellation['reason'], 'cancellation reason')
-        self.assertIn('id', cancellation)
-        self.assertIn(cancellation['id'], response.headers['Location'])
-
-        response = self.app.get('/auctions/{}'.format(self.auction_id))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']['lots'][0]["status"], 'active')
-        self.assertEqual(response.json['data']["status"], 'active.tendering')
-
-        response = self.app.post_json('/auctions/{}/cancellations'.format(self.auction_id), {'data': {
-            'reason': 'cancellation reason',
-            'status': 'active',
-            "cancellationOf": "lot",
-            "relatedLot": lot_id
-        }})
-        self.assertEqual(response.status, '201 Created')
-        self.assertEqual(response.content_type, 'application/json')
-        cancellation = response.json['data']
-        self.assertEqual(cancellation['reason'], 'cancellation reason')
-        self.assertEqual(cancellation['status'], 'active')
-        self.assertIn('id', cancellation)
-        self.assertIn(cancellation['id'], response.headers['Location'])
-
-        response = self.app.get('/auctions/{}'.format(self.auction_id))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']['lots'][0]["status"], 'cancelled')
-        self.assertNotEqual(response.json['data']["status"], 'cancelled')
-
-        response = self.app.post_json('/auctions/{}/cancellations'.format(self.auction_id), {'data': {
-            'reason': 'cancellation reason',
-            'status': 'active',
-            "cancellationOf": "lot",
-            "relatedLot": lot_id
-        }}, status=403)
-        self.assertEqual(response.status, '403 Forbidden')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Can add cancellation only in active lot status")
-
-    def test_patch_auction_cancellation(self):
-        lot_id = self.initial_lots[0]['id']
-        response = self.app.post_json('/auctions/{}/cancellations'.format(self.auction_id), {'data': {
-            'reason': 'cancellation reason',
-            "cancellationOf": "lot",
-            "relatedLot": lot_id
-        }})
-        self.assertEqual(response.status, '201 Created')
-        self.assertEqual(response.content_type, 'application/json')
-        cancellation = response.json['data']
-
-        response = self.app.patch_json('/auctions/{}/cancellations/{}'.format(self.auction_id, cancellation['id']), {"data": {"status": "active"}})
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["status"], "active")
-
-        response = self.app.get('/auctions/{}'.format(self.auction_id))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']['lots'][0]["status"], 'cancelled')
-        self.assertNotEqual(response.json['data']["status"], 'cancelled')
-
-        response = self.app.patch_json('/auctions/{}/cancellations/{}'.format(self.auction_id, cancellation['id']), {"data": {"status": "pending"}}, status=403)
-        self.assertEqual(response.status, '403 Forbidden')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Can update cancellation only in active lot status")
-
-        response = self.app.get('/auctions/{}/cancellations/{}'.format(self.auction_id, cancellation['id']))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["status"], "active")
-        self.assertEqual(response.json['data']["reason"], "cancellation reason")
-
-
-class AuctionCancellationDocumentResourceTest(BaseAuctionWebTest):
+class InsiderAuctionCancellationDocumentResourceTest(BaseInsiderAuctionWebTest):
 
     def setUp(self):
-        super(AuctionCancellationDocumentResourceTest, self).setUp()
+        super(InsiderAuctionCancellationDocumentResourceTest, self).setUp()
         # Create cancellation
         response = self.app.post_json('/auctions/{}/cancellations'.format(
             self.auction_id), {'data': {'reason': 'cancellation reason'}})
@@ -668,28 +495,10 @@ class AuctionCancellationDocumentResourceTest(BaseAuctionWebTest):
         self.assertEqual(response.json['errors'][0]["description"], "Can't update document in current (complete) auction status")
 
 
-class FinancialAuctionCancellationResourceTest(AuctionCancellationResourceTest):
-    initial_bids = test_financial_bids
-    initial_data = test_financial_auction_data
-
-
-@unittest.skip("option not available")
-class FinancialAuctionLotsCancellationResourceTest(AuctionLotsCancellationResourceTest):
-    initial_data = test_financial_auction_data
-
-
-class FinancialAuctionCancellationDocumentResourceTest(AuctionCancellationDocumentResourceTest):
-    initial_data = test_financial_auction_data
-
-
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(AuctionCancellationDocumentResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionLotsCancellationResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionCancellationResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionCancellationDocumentResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionLotsCancellationResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionCancellationResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionCancellationResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionCancellationDocumentResourceTest))
     return suite
 
 

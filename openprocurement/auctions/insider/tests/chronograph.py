@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 import unittest
-from datetime import datetime, timedelta
+from datetime import timedelta
 from openprocurement.api.models import get_now
-from openprocurement.auctions.insider.tests.base import BaseAuctionWebTest, test_lots, test_bids, test_financial_auction_data, test_financial_organization, test_financial_bids, test_organization
+from openprocurement.auctions.insider.tests.base import (
+    BaseInsiderAuctionWebTest, test_financial_bids,
+    test_insider_auction_data, test_financial_organization,
+)
 
 
-class AuctionSwitchQualificationResourceTest(BaseAuctionWebTest):
-    initial_bids = test_bids[:1]
+class InsiderAuctionSwitchQualificationResourceTest(BaseInsiderAuctionWebTest):
+    initial_bids = test_financial_bids[:1]
 
     def test_switch_to_qualification(self):
         response = self.set_status('active.auction', {'status': self.initial_status})
@@ -18,8 +21,8 @@ class AuctionSwitchQualificationResourceTest(BaseAuctionWebTest):
         self.assertNotIn("awards", response.json['data'])
 
 
-class AuctionSwitchAuctionResourceTest(BaseAuctionWebTest):
-    initial_bids = test_bids
+class InsiderAuctionSwitchAuctionResourceTest(BaseInsiderAuctionWebTest):
+    initial_bids = test_financial_bids
 
     def test_switch_to_auction(self):
         response = self.set_status('active.auction', {'status': self.initial_status})
@@ -30,7 +33,7 @@ class AuctionSwitchAuctionResourceTest(BaseAuctionWebTest):
         self.assertEqual(response.json['data']["status"], "active.auction")
 
 
-class AuctionSwitchUnsuccessfulResourceTest(BaseAuctionWebTest):
+class InsiderAuctionSwitchUnsuccessfulResourceTest(BaseInsiderAuctionWebTest):
 
     def test_switch_to_unsuccessful(self):
         response = self.set_status('active.auction', {'status': self.initial_status})
@@ -43,23 +46,8 @@ class AuctionSwitchUnsuccessfulResourceTest(BaseAuctionWebTest):
             self.assertEqual(set([i['status'] for i in response.json['data']["lots"]]), set(["unsuccessful"]))
 
 
-@unittest.skip("option not available")
-class AuctionLotSwitchQualificationResourceTest(AuctionSwitchQualificationResourceTest):
-    initial_lots = test_lots
-
-
-@unittest.skip("option not available")
-class AuctionLotSwitchAuctionResourceTest(AuctionSwitchAuctionResourceTest):
-    initial_lots = test_lots
-
-
-@unittest.skip("option not available")
-class AuctionLotSwitchUnsuccessfulResourceTest(AuctionSwitchUnsuccessfulResourceTest):
-    initial_lots = test_lots
-
-
-class AuctionAuctionPeriodResourceTest(BaseAuctionWebTest):
-    initial_bids = test_bids
+class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
+    initial_bids = test_financial_bids
 
     def test_set_auction_period(self):
         self.app.authorization = ('Basic', ('chronograph', ''))
@@ -207,21 +195,28 @@ class AuctionAuctionPeriodResourceTest(BaseAuctionWebTest):
         self.assertIn('9999-01-01T00:00:00', response.json['data']['next_check'])
 
 
-class AuctionAwardSwitchResourceTest(BaseAuctionWebTest):
+class InsiderAuctionAwardSwitchResourceTest(BaseInsiderAuctionWebTest):
     initial_status = 'active.auction'
-    initial_bids = test_bids
+    initial_bids = test_financial_bids
 
     def setUp(self):
-        super(AuctionAwardSwitchResourceTest, self).setUp()
+        super(InsiderAuctionAwardSwitchResourceTest, self).setUp()
         authorization = self.app.authorization
         self.app.authorization = ('Basic', ('auction', ''))
+        now = get_now()
+        response = self.app.get('/auctions/{}'.format(self.auction_id))
+        self.assertEqual(response.status, '200 OK')
+        auction = response.json['data']
+        value_threshold = auction['value']['amount'] + auction['minimalStep']['amount']
+
         now = get_now()
         auction_result = {
             'bids': [
                 {
                     "id": b['id'],
                     "date": (now - timedelta(seconds=i)).isoformat(),
-                    "value": b['value']
+                    "value": {"amount": value_threshold * 2},
+
                 }
                 for i, b in enumerate(self.initial_bids)
             ]
@@ -331,37 +326,43 @@ class AuctionAwardSwitchResourceTest(BaseAuctionWebTest):
         self.assertNotIn('endDate', auction['awardPeriod'])
 
 
-class AuctionAwardSwitch2ResourceTest(BaseAuctionWebTest):
+class InsiderAuctionAwardSwitch2ResourceTest(BaseInsiderAuctionWebTest):
     initial_status = 'active.auction'
-    initial_bids = [
-        {
-            "tenderers": [
-                test_organization
-            ],
-            "value": {
-                "amount": 101 * (i + 1),
-                "currency": "UAH",
-                "valueAddedTaxIncluded": True
-            },
-            'qualified': True
-        }
-        for i in range(2)
-    ]
+    initial_bids = test_financial_bids
 
     def setUp(self):
-        super(AuctionAwardSwitch2ResourceTest, self).setUp()
+        super(InsiderAuctionAwardSwitch2ResourceTest, self).setUp()
         authorization = self.app.authorization
         self.app.authorization = ('Basic', ('auction', ''))
 
-        response = self.app.post_json('/auctions/{}/auction'.format(self.auction_id), {'data': {'bids': self.initial_bids}})
+        response = self.app.get('/auctions/{}'.format(self.auction_id))
+        self.assertEqual(response.status, '200 OK')
+        auction = response.json['data']
+        value_threshold = auction['value']['amount'] + auction['minimalStep']['amount']
+
+        now = get_now()
+
+        auction_result = {
+            'bids': [
+                {
+                    "id": b['id'],
+                    "date": (now - timedelta(seconds=i)).isoformat(),
+                    "value": {"amount": 101 * (i + 1)},
+
+                }
+                for i, b in enumerate(self.initial_bids)
+            ]
+        }
+
+        response = self.app.post_json('/auctions/{}/auction'.format(self.auction_id), {'data': auction_result})
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/json')
         auction = response.json['data']
         self.assertEqual('active.qualification', auction["status"])
         self.award = self.first_award = auction['awards'][0]
-        self.second_award = auction['awards'][1]
+        # self.second_award = auction['awards'][1]
         self.award_id = self.first_award_id = self.first_award['id']
-        self.second_award_id = self.second_award['id']
+        # self.second_award_id = self.second_award['id']
         self.app.authorization = authorization
 
     def test_switch_verification_to_unsuccessful(self):
@@ -375,7 +376,7 @@ class AuctionAwardSwitch2ResourceTest(BaseAuctionWebTest):
         auction = response.json['data']
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(auction['awards'][0]['status'], 'unsuccessful')
-        self.assertEqual(auction['awards'][1]['status'], 'unsuccessful')
+        # self.assertEqual(auction['awards'][1]['status'], 'unsuccessful')
         self.assertEqual(auction['status'], 'unsuccessful')
         self.assertIn('endDate', auction['awardPeriod'])
 
@@ -411,7 +412,7 @@ class AuctionAwardSwitch2ResourceTest(BaseAuctionWebTest):
         auction = response.json['data']
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(auction['awards'][0]['status'], 'unsuccessful')
-        self.assertEqual(auction['awards'][1]['status'], 'unsuccessful')
+        # self.assertEqual(auction['awards'][1]['status'], 'unsuccessful')
         self.assertEqual(auction['status'], 'unsuccessful')
         self.assertIn('endDate', auction['awardPeriod'])
 
@@ -452,17 +453,12 @@ class AuctionAwardSwitch2ResourceTest(BaseAuctionWebTest):
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(auction['awards'][0]['status'], 'unsuccessful')
         self.assertEqual(auction['contracts'][0]['status'], 'cancelled')
-        self.assertEqual(auction['awards'][1]['status'], 'unsuccessful')
+        # self.assertEqual(auction['awards'][1]['status'], 'unsuccessful')
         self.assertEqual(auction['status'], 'unsuccessful')
         self.assertIn('endDate', auction['awardPeriod'])
 
 
-@unittest.skip("option not available")
-class AuctionLotAuctionPeriodResourceTest(AuctionAuctionPeriodResourceTest):
-    initial_lots = test_lots
-
-
-class AuctionComplaintSwitchResourceTest(BaseAuctionWebTest):
+class InsiderAuctionComplaintSwitchResourceTest(BaseInsiderAuctionWebTest):
 
     def test_switch_to_pending(self):
         response = self.app.post_json('/auctions/{}/complaints'.format(self.auction_id), {'data': {
@@ -516,105 +512,8 @@ class AuctionComplaintSwitchResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.json['data']["complaints"][-1]['status'], status)
 
 
-@unittest.skip("option not available")
-class AuctionLotComplaintSwitchResourceTest(AuctionComplaintSwitchResourceTest):
-    initial_lots = test_lots
-
-
-@unittest.skip("option not available")
-class AuctionAwardComplaintSwitchResourceTest(BaseAuctionWebTest):
-    initial_status = 'active.qualification'
-    initial_bids = test_bids
-
-    def setUp(self):
-        super(AuctionAwardComplaintSwitchResourceTest, self).setUp()
-        # Create award
-        response = self.app.post_json('/auctions/{}/awards'.format(
-            self.auction_id), {'data': {'suppliers': [self.initial_organization], 'status': 'pending', 'bid_id': self.initial_bids[0]['id']}})
-        award = response.json['data']
-        self.award_id = award['id']
-
-    def test_switch_to_pending(self):
-        response = self.app.post_json('/auctions/{}/awards/{}/complaints'.format(self.auction_id, self.award_id), {'data': {
-            'title': 'complaint title',
-            'description': 'complaint description',
-            'author': self.initial_organization,
-            'status': 'claim'
-        }})
-        self.assertEqual(response.status, '201 Created')
-        self.assertEqual(response.json['data']['status'], 'claim')
-
-        response = self.app.patch_json('/auctions/{}/awards/{}'.format(self.auction_id, self.award_id), {"data": {"status": "active"}})
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["status"], "active")
-
-        auction = self.db.get(self.auction_id)
-        auction['awards'][0]['complaints'][0]['dateSubmitted'] = (get_now() - timedelta(days=1 if 'procurementMethodDetails' in auction else 4)).isoformat()
-        self.db.save(auction)
-
-        self.app.authorization = ('Basic', ('chronograph', ''))
-        response = self.app.patch_json('/auctions/{}'.format(self.auction_id), {'data': {'id': self.auction_id}})
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.json['data']['awards'][0]["complaints"][0]['status'], 'pending')
-
-    def test_switch_to_complaint(self):
-        response = self.app.patch_json('/auctions/{}/awards/{}'.format(self.auction_id, self.award_id), {"data": {"status": "active"}})
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["status"], "active")
-
-        for status in ['invalid', 'resolved', 'declined']:
-            self.app.authorization = ('Basic', ('token', ''))
-            response = self.app.post_json('/auctions/{}/awards/{}/complaints'.format(self.auction_id, self.award_id), {'data': {
-                'title': 'complaint title',
-                'description': 'complaint description',
-                'author': self.initial_organization,
-                'status': 'claim'
-            }})
-            self.assertEqual(response.status, '201 Created')
-            self.assertEqual(response.json['data']['status'], 'claim')
-            complaint = response.json['data']
-
-            response = self.app.patch_json('/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(self.auction_id, self.award_id, complaint['id'], self.auction_token), {"data": {
-                "status": "answered",
-                "resolution": status * 4,
-                "resolutionType": status
-            }})
-            self.assertEqual(response.status, '200 OK')
-            self.assertEqual(response.content_type, 'application/json')
-            self.assertEqual(response.json['data']["status"], "answered")
-            self.assertEqual(response.json['data']["resolutionType"], status)
-
-            auction = self.db.get(self.auction_id)
-            auction['awards'][0]['complaints'][-1]['dateAnswered'] = (get_now() - timedelta(days=1 if 'procurementMethodDetails' in auction else 4)).isoformat()
-            self.db.save(auction)
-
-            self.app.authorization = ('Basic', ('chronograph', ''))
-            response = self.app.patch_json('/auctions/{}'.format(self.auction_id), {'data': {'id': self.auction_id}})
-            self.assertEqual(response.status, '200 OK')
-            self.assertEqual(response.json['data']['awards'][0]["complaints"][-1]['status'], status)
-
-
-@unittest.skip("option not available")
-class AuctionLotAwardComplaintSwitchResourceTest(AuctionAwardComplaintSwitchResourceTest):
-    initial_lots = test_lots
-
-    def setUp(self):
-        super(AuctionAwardComplaintSwitchResourceTest, self).setUp()
-        # Create award
-        response = self.app.post_json('/auctions/{}/awards'.format(self.auction_id), {'data': {
-            'suppliers': [self.initial_organization],
-            'status': 'pending',
-            'bid_id': self.initial_bids[0]['id'],
-            'lotID': self.initial_bids[0]['lotValues'][0]['relatedLot']
-        }})
-        award = response.json['data']
-        self.award_id = award['id']
-
-
-class AuctionDontSwitchSuspendedAuction2ResourceTest(BaseAuctionWebTest):
-    initial_bids = test_bids
+class InsiderAuctionDontSwitchSuspendedAuction2ResourceTest(BaseInsiderAuctionWebTest):
+    initial_bids = test_financial_bids
 
     def test_switch_suspended_auction_to_auction(self):
         self.app.authorization = ('Basic', ('administrator', ''))
@@ -636,21 +535,29 @@ class AuctionDontSwitchSuspendedAuction2ResourceTest(BaseAuctionWebTest):
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['data']["status"], "active.auction")
 
-class AuctionDontSwitchSuspendedAuctionResourceTest(BaseAuctionWebTest):
+
+class InsiderAuctionDontSwitchSuspendedAuctionResourceTest(BaseInsiderAuctionWebTest):
     initial_status = 'active.auction'
-    initial_bids = test_bids
+    initial_bids = test_financial_bids
 
     def setUp(self):
-        super(AuctionDontSwitchSuspendedAuctionResourceTest, self).setUp()
+        super(InsiderAuctionDontSwitchSuspendedAuctionResourceTest, self).setUp()
         authorization = self.app.authorization
         self.app.authorization = ('Basic', ('auction', ''))
+        now = get_now()
+        response = self.app.get('/auctions/{}'.format(self.auction_id))
+        self.assertEqual(response.status, '200 OK')
+        auction = response.json['data']
+        value_threshold = auction['value']['amount'] + auction['minimalStep']['amount']
+
         now = get_now()
         auction_result = {
             'bids': [
                 {
                     "id": b['id'],
                     "date": (now - timedelta(seconds=i)).isoformat(),
-                    "value": b['value']
+                    "value": {"amount": value_threshold * 2},
+
                 }
                 for i, b in enumerate(self.initial_bids)
             ]
@@ -805,99 +712,19 @@ class AuctionDontSwitchSuspendedAuctionResourceTest(BaseAuctionWebTest):
         self.assertNotIn('endDate', auction['awardPeriod'])
 
 
-class FinancialAuctionSwitchQualificationResourceTest(AuctionSwitchQualificationResourceTest):
-    initial_bids = test_financial_bids[:1]
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-class FinancialAuctionSwitchAuctionResourceTest(AuctionSwitchAuctionResourceTest):
-    initial_bids = test_financial_bids
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-class FinancialAuctionSwitchUnsuccessfulResourceTest(AuctionSwitchUnsuccessfulResourceTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-@unittest.skip("option not available")
-class FinancialAuctionLotSwitchQualificationResourceTest(AuctionLotSwitchQualificationResourceTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-@unittest.skip("option not available")
-class FinancialAuctionLotSwitchAuctionResourceTest(AuctionLotSwitchAuctionResourceTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-@unittest.skip("option not available")
-class FinancialAuctionLotSwitchUnsuccessfulResourceTest(AuctionLotSwitchUnsuccessfulResourceTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-class FinancialAuctionAuctionPeriodResourceTest(AuctionAuctionPeriodResourceTest):
-    initial_bids = test_financial_bids
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-@unittest.skip("option not available")
-class FinancialAuctionLotAuctionPeriodResourceTest(AuctionLotAuctionPeriodResourceTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-class FinancialAuctionComplaintSwitchResourceTest(AuctionComplaintSwitchResourceTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-@unittest.skip("option not available")
-class FinancialAuctionLotComplaintSwitchResourceTest(AuctionLotComplaintSwitchResourceTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-@unittest.skip("option not available")
-class FinancialAuctionAwardComplaintSwitchResourceTest(AuctionAwardComplaintSwitchResourceTest):
-    initial_bids = test_financial_bids
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-@unittest.skip("option not available")
-class FinancialAuctionLotAwardComplaintSwitchResourceTest(AuctionLotAwardComplaintSwitchResourceTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(AuctionAwardComplaintSwitchResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionComplaintSwitchResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionLotAwardComplaintSwitchResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionLotComplaintSwitchResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionLotSwitchAuctionResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionLotSwitchQualificationResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionLotSwitchUnsuccessfulResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionSwitchAuctionResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionSwitchQualificationResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionSwitchUnsuccessfulResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionAwardComplaintSwitchResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionComplaintSwitchResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionLotAwardComplaintSwitchResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionLotComplaintSwitchResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionLotSwitchAuctionResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionLotSwitchQualificationResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionLotSwitchUnsuccessfulResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionSwitchAuctionResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionSwitchQualificationResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionSwitchUnsuccessfulResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionSwitchQualificationResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionSwitchAuctionResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionSwitchUnsuccessfulResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionAuctionPeriodResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionAwardSwitchResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionAwardSwitchResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionAwardSwitch2ResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionComplaintSwitchResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionDontSwitchSuspendedAuction2ResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionDontSwitchSuspendedAuctionResourceTest))
     return suite
 
 

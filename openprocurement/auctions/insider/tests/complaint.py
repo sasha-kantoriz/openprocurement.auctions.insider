@@ -2,12 +2,12 @@
 import unittest
 
 from openprocurement.auctions.insider.tests.base import (
-    BaseAuctionWebTest, test_auction_data, test_lots,
-    test_financial_auction_data, test_financial_organization
+    BaseInsiderAuctionWebTest, test_financial_bids,
+    test_insider_auction_data, test_financial_organization,
 )
 
 
-class AuctionComplaintResourceTest(BaseAuctionWebTest):
+class InsiderAuctionComplaintResourceTest(BaseInsiderAuctionWebTest):
 
     def test_create_auction_complaint_invalid(self):
         response = self.app.post_json('/auctions/some_id/complaints', {
@@ -411,82 +411,10 @@ class AuctionComplaintResourceTest(BaseAuctionWebTest):
         ])
 
 
-@unittest.skip("option not available")
-class AuctionLotAwardComplaintResourceTest(BaseAuctionWebTest):
-    initial_lots = test_lots
-
-    def test_create_auction_complaint(self):
-        response = self.app.post_json('/auctions/{}/complaints'.format(self.auction_id), {'data': {
-            'title': 'complaint title',
-            'description': 'complaint description',
-            'author': self.initial_organization,
-            'relatedLot': self.initial_lots[0]['id'],
-            'status': 'claim'
-        }})
-        self.assertEqual(response.status, '201 Created')
-        self.assertEqual(response.content_type, 'application/json')
-        complaint = response.json['data']
-        owner_token = response.json['access']['token']
-        self.assertEqual(complaint['author']['name'], self.initial_organization['name'])
-        self.assertIn('id', complaint)
-        self.assertIn(complaint['id'], response.headers['Location'])
-
-        auction = self.db.get(self.auction_id)
-        auction['status'] = 'active.awarded'
-        auction['awardPeriod'] = {'endDate': '2014-01-01'}
-        self.db.save(auction)
-
-        response = self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(self.auction_id, complaint['id'], self.auction_token), {"data": {
-            "status": "answered"
-        }}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'], [
-            {u'description': [u'This field is required.'], u'location': u'body', u'name': u'resolutionType'},
-        ])
-
-        response = self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(self.auction_id, complaint['id'], self.auction_token), {"data": {
-            "status": "answered",
-            "resolutionType": "invalid",
-            "resolution": "spam 100% " * 3
-        }})
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["status"], "answered")
-        self.assertEqual(response.json['data']["resolutionType"], "invalid")
-        self.assertEqual(response.json['data']["resolution"], "spam 100% " * 3)
-
-        response = self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(self.auction_id, complaint['id'], owner_token), {"data": {
-            "satisfied": True,
-            "status": "resolved"
-        }})
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["status"], "resolved")
-
-        response = self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(self.auction_id, complaint['id'], owner_token), {"data": {"status": "cancelled", "cancellationReason": "reason"}}, status=403)
-        self.assertEqual(response.status, '403 Forbidden')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Can't update complaint in current (resolved) status")
-
-        response = self.app.get('/auctions/{}'.format(self.auction_id))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["status"], 'active.awarded')
-
-        self.set_status('unsuccessful')
-
-        response = self.app.post_json('/auctions/{}/complaints'.format(
-            self.auction_id), {'data': {'title': 'complaint title', 'description': 'complaint description', 'author': self.initial_organization}}, status=403)
-        self.assertEqual(response.status, '403 Forbidden')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Can't add complaint in current (unsuccessful) auction status")
-
-
-class AuctionComplaintDocumentResourceTest(BaseAuctionWebTest):
+class InsiderAuctionComplaintDocumentResourceTest(BaseInsiderAuctionWebTest):
 
     def setUp(self):
-        super(AuctionComplaintDocumentResourceTest, self).setUp()
+        super(InsiderAuctionComplaintDocumentResourceTest, self).setUp()
         # Create complaint
         response = self.app.post_json('/auctions/{}/complaints'.format(
             self.auction_id), {'data': {'title': 'complaint title', 'description': 'complaint description', 'author': self.initial_organization}})
@@ -780,25 +708,10 @@ class AuctionComplaintDocumentResourceTest(BaseAuctionWebTest):
         self.assertEqual(response.json['errors'][0]["description"], "Can't update document in current (complete) auction status")
 
 
-class FinancialAuctionComplaintResourceTest(BaseAuctionWebTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-@unittest.skip("option not available")
-class FinancialAuctionLotAwardComplaint(BaseAuctionWebTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-class FinancialAuctionComplaintDocumentResourceTest(BaseAuctionWebTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(AuctionComplaintDocumentResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionComplaintResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionComplaintDocumentResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionComplaintResourceTest))
     return suite
 
 

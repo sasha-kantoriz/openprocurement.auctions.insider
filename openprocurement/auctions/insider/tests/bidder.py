@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 import unittest
-from copy import deepcopy
 from urllib import unquote
 from base64 import b64decode
 from libnacl.sign import Signer, Verifier
-from openprocurement.auctions.insider.tests.base import BaseAuctionWebTest, test_auction_data, test_features_auction_data, test_financial_organization, test_financial_auction_data
+from openprocurement.auctions.insider.tests.base import (
+    BaseInsiderAuctionWebTest, test_financial_bids,
+    test_insider_auction_data, test_financial_organization,
+)
 
-
-class AuctionBidderResourceTest(BaseAuctionWebTest):
+class InsiderAuctionBidderResourceTest(BaseInsiderAuctionWebTest):
     initial_status = 'active.tendering'
 
     def test_create_auction_bidder_invalid(self):
-        response = self.app.post_json('/auctions/some_id/bids', {
-                                      'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True}}, status=404)
+        response = self.app.post_json('/auctions/some_id/bids',
+            {'data': {'tenderers': [self.initial_organization], 'qualified': True, 'eligible': True}}, status=404)
         self.assertEqual(response.status, '404 Not Found')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['status'], 'error')
@@ -86,11 +87,8 @@ class AuctionBidderResourceTest(BaseAuctionWebTest):
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['status'], 'error')
         self.assertIn({u"location": u"body", u"name": u"qualified", u"description": [u"This field is required."]}, response.json['errors'])
-        if self.initial_organization == test_financial_organization:
-            self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'eligible'}, response.json['errors'])
-            self.assertIn({u'description': [{u'additionalIdentifiers': [u'This field is required.'], u'contactPoint': [u'This field is required.'], u'identifier': {u'scheme': [u'This field is required.'], u'id': [u'This field is required.']}, u'name': [u'This field is required.'], u'address': [u'This field is required.']}], u'location': u'body', u'name': u'tenderers'}, response.json['errors'])
-        else:
-            self.assertIn({u'description': [{u'contactPoint': [u'This field is required.'], u'identifier': {u'scheme': [u'This field is required.'], u'id': [u'This field is required.']}, u'name': [u'This field is required.'], u'address': [u'This field is required.']}], u'location': u'body', u'name': u'tenderers'}, response.json['errors'])
+        self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'eligible'}, response.json['errors'])
+        self.assertIn({u'description': [{u'contactPoint': [u'This field is required.'], u'identifier': {u'scheme': [u'This field is required.'], u'id': [u'This field is required.']}, u'name': [u'This field is required.'], u'address': [u'This field is required.']}], u'location': u'body', u'name': u'tenderers'}, response.json['errors'])
 
         response = self.app.post_json(request_path, {'data': {'tenderers': [{
             'name': 'name', 'identifier': {'uri': 'invalid_value'}}]}}, status=422)
@@ -98,11 +96,8 @@ class AuctionBidderResourceTest(BaseAuctionWebTest):
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['status'], 'error')
         self.assertIn({u"location": u"body", u"name": u"qualified", u"description": [u"This field is required."]}, response.json['errors'])
-        if self.initial_organization == test_financial_organization:
-            self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'eligible'}, response.json['errors'])
-            self.assertIn({u'description': [{u'additionalIdentifiers': [u'This field is required.'], u'contactPoint': [u'This field is required.'], u'identifier': {u'scheme': [u'This field is required.'], u'id': [u'This field is required.'], u'uri': [u'Not a well formed URL.']}, u'address': [u'This field is required.']}], u'location': u'body', u'name': u'tenderers'}, response.json['errors'])
-        else:
-            self.assertIn({u'description': [{u'contactPoint': [u'This field is required.'], u'identifier': {u'scheme': [u'This field is required.'], u'id': [u'This field is required.'], u'uri': [u'Not a well formed URL.']}, u'address': [u'This field is required.']}], u'location': u'body', u'name': u'tenderers'}, response.json['errors'])
+        self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'eligible'}, response.json['errors'])
+        self.assertIn({u'description': [{u'contactPoint': [u'This field is required.'], u'identifier': {u'scheme': [u'This field is required.'], u'id': [u'This field is required.'], u'uri': [u'Not a well formed URL.']}, u'address': [u'This field is required.']}], u'location': u'body', u'name': u'tenderers'}, response.json['errors'])
 
         if self.initial_organization == test_financial_organization:
             response = self.app.post_json(request_path, {'data': {'tenderers': [self.initial_organization], 'qualified': True, 'eligible': True}})
@@ -236,30 +231,23 @@ class AuctionBidderResourceTest(BaseAuctionWebTest):
         self.assertEqual(response.json['data']['date'], bidder['date'])
         self.assertNotEqual(response.json['data']['tenderers'][0]['name'], bidder['tenderers'][0]['name'])
 
-        response = self.app.patch_json('/auctions/{}/bids/{}'.format(self.auction_id, bidder['id']), {"data": {"value": {"amount": 500}, 'tenderers': [self.initial_organization]}})
+        response = self.app.patch_json('/auctions/{}/bids/{}'.format(self.auction_id, bidder['id']), {"data": {'tenderers': [self.initial_organization]}})
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['data']['date'], bidder['date'])
         self.assertEqual(response.json['data']['tenderers'][0]['name'], bidder['tenderers'][0]['name'])
 
-        response = self.app.patch_json('/auctions/{}/bids/{}'.format(self.auction_id, bidder['id']), {"data": {"value": {"amount": 400}}})
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["value"]["amount"], 400)
-        self.assertNotEqual(response.json['data']['date'], bidder['date'])
-
         response = self.app.patch_json('/auctions/{}/bids/{}'.format(self.auction_id, bidder['id']), {"data": {"status": "active"}})
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['data']["status"], "active")
-        self.assertNotEqual(response.json['data']['date'], bidder['date'])
 
         response = self.app.patch_json('/auctions/{}/bids/{}'.format(self.auction_id, bidder['id']), {"data": {"status": "draft"}}, status=403)
         self.assertEqual(response.status, '403 Forbidden')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['errors'][0]["description"], "Can\'t update bid to (draft) status")
 
-        response = self.app.patch_json('/auctions/{}/bids/some_id'.format(self.auction_id), {"data": {"value": {"amount": 400}}}, status=404)
+        response = self.app.patch_json('/auctions/{}/bids/some_id'.format(self.auction_id), {"data":{'tenderers': [self.initial_organization]}}, status=404)
         self.assertEqual(response.status, '404 Not Found')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['status'], 'error')
@@ -268,7 +256,7 @@ class AuctionBidderResourceTest(BaseAuctionWebTest):
                 u'url', u'name': u'bid_id'}
         ])
 
-        response = self.app.patch_json('/auctions/some_id/bids/some_id', {"data": {"value": {"amount": 400}}}, status=404)
+        response = self.app.patch_json('/auctions/some_id/bids/some_id', {"data": {'tenderers': [self.initial_organization]}}, status=404)
         self.assertEqual(response.status, '404 Not Found')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['status'], 'error')
@@ -279,12 +267,7 @@ class AuctionBidderResourceTest(BaseAuctionWebTest):
 
         self.set_status('complete')
 
-        response = self.app.get('/auctions/{}/bids/{}'.format(self.auction_id, bidder['id']))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["value"]["amount"], 400)
-
-        response = self.app.patch_json('/auctions/{}/bids/{}'.format(self.auction_id, bidder['id']), {"data": {"value": {"amount": 400}}}, status=403)
+        response = self.app.patch_json('/auctions/{}/bids/{}'.format(self.auction_id, bidder['id']), {"data": {'tenderers': [self.initial_organization]}}, status=403)
         self.assertEqual(response.status, '403 Forbidden')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['errors'][0]["description"], "Can't update bid in current (complete) auction status")
@@ -363,12 +346,9 @@ class AuctionBidderResourceTest(BaseAuctionWebTest):
         self.assertEqual(verified, bidder['id'])
 
     def test_delete_auction_bidder(self):
-        if self.initial_organization == test_financial_organization:
-            response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True, 'eligible': True}})
-        else:
-            response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True}})
+        response = self.app.post_json('/auctions/{}/bids'.format(
+            self.auction_id), {'data': {'tenderers': [self.initial_organization], 'qualified': True, 'eligible': True}})
+
         self.assertEqual(response.status, '201 Created')
         self.assertEqual(response.content_type, 'application/json')
         bidder = response.json['data']
@@ -401,12 +381,8 @@ class AuctionBidderResourceTest(BaseAuctionWebTest):
         ])
 
     def test_get_auction_auctioners(self):
-        if self.initial_organization == test_financial_organization:
-            response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True, 'eligible': True}})
-        else:
-            response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True}})
+        response = self.app.post_json('/auctions/{}/bids'.format(
+            self.auction_id), {'data': {'tenderers': [self.initial_organization], 'qualified': True, 'eligible': True}})
         self.assertEqual(response.status, '201 Created')
         self.assertEqual(response.content_type, 'application/json')
         bidder = response.json['data']
@@ -433,145 +409,29 @@ class AuctionBidderResourceTest(BaseAuctionWebTest):
         ])
 
     def test_bid_Administrator_change(self):
-        if self.initial_organization == test_financial_organization:
-            response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True, 'eligible': True}})
-        else:
-            response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True}})
+        response = self.app.post_json('/auctions/{}/bids'.format(
+            self.auction_id), {'data': {'tenderers': [self.initial_organization], 'qualified': True, 'eligible': True}})
         self.assertEqual(response.status, '201 Created')
         self.assertEqual(response.content_type, 'application/json')
         bidder = response.json['data']
 
         self.app.authorization = ('Basic', ('administrator', ''))
         response = self.app.patch_json('/auctions/{}/bids/{}'.format(self.auction_id, bidder['id']), {"data": {
-            'tenderers': [{"identifier": {"id": "00000000"}}],
-            "value": {"amount": 400}
+            'tenderers': [{"identifier": {"id": "00000000"}}]
         }})
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/json')
-        self.assertNotEqual(response.json['data']["value"]["amount"], 400)
         self.assertEqual(response.json['data']["tenderers"][0]["identifier"]["id"], "00000000")
 
 
-@unittest.skip("option not available")
-class AuctionBidderFeaturesResourceTest(BaseAuctionWebTest):
-    initial_data = test_features_auction_data
-    initial_status = 'active.tendering'
-
-    def test_features_bidder(self):
-        test_features_bids = [
-            {
-                "parameters": [
-                    {
-                        "code": i["code"],
-                        "value": 0.1,
-                    }
-                    for i in self.initial_data['features']
-                ],
-                "status": "active",
-                "tenderers": [
-                    self.initial_organization
-                ],
-                "value": {
-                    "amount": 469,
-                    "currency": "UAH",
-                    "valueAddedTaxIncluded": True
-                }
-            },
-            {
-                "parameters": [
-                    {
-                        "code": i["code"],
-                        "value": 0.15,
-                    }
-                    for i in self.initial_data['features']
-                ],
-                "tenderers": [
-                    self.initial_organization
-                ],
-                "status": "draft",
-                "value": {
-                    "amount": 479,
-                    "currency": "UAH",
-                    "valueAddedTaxIncluded": True
-                }
-            }
-        ]
-        for i in test_features_bids:
-            response = self.app.post_json('/auctions/{}/bids'.format(self.auction_id), {'data': i})
-            self.assertEqual(response.status, '201 Created')
-            self.assertEqual(response.content_type, 'application/json')
-            bid = response.json['data']
-            bid.pop(u'date')
-            bid.pop(u'id')
-            self.assertEqual(bid, i)
-
-    def test_features_bidder_invalid(self):
-        data = {
-            "tenderers": [
-                self.initial_organization
-            ],
-            "value": {
-                "amount": 469,
-                "currency": "UAH",
-                "valueAddedTaxIncluded": True
-            }
-        }
-        response = self.app.post_json('/auctions/{}/bids'.format(self.auction_id), {'data': data}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': [u'This field is required.'], u'location': u'body', u'name': u'parameters'}
-        ])
-        data["parameters"] = [
-            {
-                "code": "OCDS-123454-AIR-INTAKE",
-                "value": 0.1,
-            }
-        ]
-        response = self.app.post_json('/auctions/{}/bids'.format(self.auction_id), {'data': data}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': [u'All features parameters is required.'], u'location': u'body', u'name': u'parameters'}
-        ])
-        data["parameters"].append({
-            "code": "OCDS-123454-AIR-INTAKE",
-            "value": 0.1,
-        })
-        response = self.app.post_json('/auctions/{}/bids'.format(self.auction_id), {'data': data}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': [u'Parameter code should be uniq for all parameters'], u'location': u'body', u'name': u'parameters'}
-        ])
-        data["parameters"][1]["code"] = "OCDS-123454-YEARS"
-        data["parameters"][1]["value"] = 0.2
-        response = self.app.post_json('/auctions/{}/bids'.format(self.auction_id), {'data': data}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': [{u'value': [u'value should be one of feature value.']}], u'location': u'body', u'name': u'parameters'}
-        ])
-
-
-class AuctionBidderDocumentResourceTest(BaseAuctionWebTest):
+class InsiderAuctionBidderDocumentResourceTest(BaseInsiderAuctionWebTest):
     initial_status = 'active.tendering'
 
     def setUp(self):
-        super(AuctionBidderDocumentResourceTest, self).setUp()
+        super(InsiderAuctionBidderDocumentResourceTest, self).setUp()
         # Create bid
-        if self.initial_organization == test_financial_organization:
-            response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True, 'eligible': True}})
-        else:
-            response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True}})
+        response = self.app.post_json('/auctions/{}/bids'.format(
+            self.auction_id), {'data': {'tenderers': [self.initial_organization], 'qualified': True, 'eligible': True}})
         bid = response.json['data']
         self.bid_id = bid['id']
         self.bid_token = response.json['access']['token']
@@ -925,12 +785,8 @@ class AuctionBidderDocumentResourceTest(BaseAuctionWebTest):
         self.assertEqual(response.json['errors'][0]["description"], "Can't update document in current (active.awarded) auction status")
 
     def test_create_auction_bidder_document_nopending(self):
-        if self.initial_organization == test_financial_organization:
-            response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True, 'eligible': True}})
-        else:
-            response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True}})
+        response = self.app.post_json('/auctions/{}/bids'.format(
+            self.auction_id), {'data': {'tenderers': [self.initial_organization], 'qualified': True, 'eligible': True}})
         bid = response.json['data']
         bid_id = bid['id']
 
@@ -962,7 +818,7 @@ class AuctionBidderDocumentResourceTest(BaseAuctionWebTest):
         self.assertEqual(response.json['errors'][0]["description"], "Can't add document because award of bid is not in pending state")
 
 
-class AuctionBidderDocumentWithDSResourceTest(AuctionBidderDocumentResourceTest):
+class InsiderAuctionBidderDocumentWithDSResourceTest(InsiderAuctionBidderDocumentResourceTest):
     docservice = True
 
     def test_create_auction_bidder_document_json(self):
@@ -1146,49 +1002,11 @@ class AuctionBidderDocumentWithDSResourceTest(AuctionBidderDocumentResourceTest)
         self.assertEqual(response.json['errors'][0]["description"], "Can't update document in current (active.awarded) auction status")
 
 
-class FinancialAuctionBidderResourceTest(AuctionBidderResourceTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-    def test_create_auction_bidder_invalid(self):
-        super(FinancialAuctionBidderResourceTest, self).test_create_auction_bidder_invalid()
-
-        organization = deepcopy(self.initial_organization)
-        organization['additionalIdentifiers'][0]['scheme'] = u'UA-EDR'
-        response = self.app.post_json('/auctions/{}/bids'.format(
-            self.auction_id), {'data': {'tenderers': [organization], 'qualified': True, 'eligible': True, "value": {"amount": 500}}}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertIn({u'description': [{u'additionalIdentifiers': [u'One of additional classifications should be UA-FIN.']}], u'location': u'body', u'name': u'tenderers'}, response.json['errors'])
-
-
-@unittest.skip("option not available")
-class FinancialAuctionBidderFeaturesResourceTest(AuctionBidderFeaturesResourceTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-class FinancialAuctionBidderDocumentWithDSResourceTest(AuctionBidderDocumentWithDSResourceTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
-class FinancialAuctionDocumentBidderResourceTest(AuctionBidderDocumentResourceTest):
-    initial_data = test_financial_auction_data
-    initial_organization = test_financial_organization
-
-
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(AuctionBidderDocumentResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionBidderDocumentWithDSResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionBidderFeaturesResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionBidderResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionDocumentBidderResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionBidderDocumentWithDSResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionBidderFeaturesResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionBidderResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionBidderResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionBidderDocumentResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionBidderDocumentWithDSResourceTest))
     return suite
 
 

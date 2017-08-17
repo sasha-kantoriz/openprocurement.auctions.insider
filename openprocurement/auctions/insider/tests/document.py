@@ -2,11 +2,11 @@
 import unittest
 from email.header import Header
 from openprocurement.api.models import get_now
-from openprocurement.auctions.insider.models import DGF_PLATFORM_LEGAL_DETAILS_FROM
-from openprocurement.auctions.insider.tests.base import BaseAuctionWebTest,  test_financial_auction_data
+from openprocurement.auctions.dgf.models import DGF_PLATFORM_LEGAL_DETAILS_FROM
+from openprocurement.auctions.insider.tests.base import BaseInsiderAuctionWebTest
 
 
-class AuctionDocumentResourceTest(BaseAuctionWebTest):
+class InsiderAuctionDocumentResourceTest(BaseInsiderAuctionWebTest):
     docservice = False
 
     def test_not_found(self):
@@ -411,7 +411,7 @@ class AuctionDocumentResourceTest(BaseAuctionWebTest):
         self.assertEqual(response.json['errors'][0]["description"], "Can't update document in current (active.auction) auction status")
 
 
-class AuctionDocumentWithDSResourceTest(AuctionDocumentResourceTest):
+class InsiderAuctionDocumentWithDSResourceTest(InsiderAuctionDocumentResourceTest):
     docservice = True
 
     def test_create_auction_document_json_invalid(self):
@@ -1117,14 +1117,6 @@ class AuctionDocumentWithDSResourceTest(AuctionDocumentResourceTest):
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['errors'][0]["description"], "Can't update document in current (active.auction) auction status")
 
-
-class FinancialAuctionDocumentResourceTest(AuctionDocumentResourceTest):
-    initial_data = test_financial_auction_data
-
-
-class FinancialAuctionDocumentWithDSResourceTest(AuctionDocumentWithDSResourceTest):
-    initial_data = test_financial_auction_data
-
     def test_create_auction_document_vdr(self):
         vdr_url = 'http://virtial-data-room.com/id_of_room'
         response = self.app.post_json('/auctions/{}/documents'.format(self.auction_id),
@@ -1329,10 +1321,8 @@ class FinancialAuctionDocumentWithDSResourceTest(AuctionDocumentWithDSResourceTe
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(AuctionDocumentResourceTest))
-    suite.addTest(unittest.makeSuite(AuctionDocumentWithDSResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionDocumentResourceTest))
-    suite.addTest(unittest.makeSuite(FinancialAuctionDocumentWithDSResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionDocumentResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionDocumentWithDSResourceTest))
     return suite
 
 
