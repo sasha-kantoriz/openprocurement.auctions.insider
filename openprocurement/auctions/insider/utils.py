@@ -17,17 +17,11 @@ LOGGER = getLogger(PKG.project_name)
 
 def check_bids(request):
     auction = request.validated['auction']
-    if auction.lots:
-        [setattr(i.auctionPeriod, 'startDate', None) for i in auction.lots if i.numberOfBids < 2 and i.auctionPeriod and i.auctionPeriod.startDate]
-        [setattr(i, 'status', 'unsuccessful') for i in auction.lots if i.numberOfBids < 2 and i.status == 'active']
-        cleanup_bids_for_cancelled_lots(auction)
-        if not set([i.status for i in auction.lots]).difference(set(['unsuccessful', 'cancelled'])):
-            auction.status = 'unsuccessful'
-    else:
-        if auction.numberOfBids < 2:
-            if auction.auctionPeriod and auction.auctionPeriod.startDate:
-                auction.auctionPeriod.startDate = None
-            auction.status = 'unsuccessful'
+    auction.status = 'unsuccessful'
+    # if auction.numberOfBids < 2:
+    #     if auction.auctionPeriod and auction.auctionPeriod.startDate:
+    #         auction.auctionPeriod.startDate = None
+    #     auction.status = 'unsuccessful'
 
 
 def check_auction_status(request):
@@ -49,58 +43,17 @@ def check_auction_status(request):
 def check_status(request):
     auction = request.validated['auction']
     now = get_now()
-    for complaint in auction.complaints:
-        check_complaint_status(request, complaint, now)
     for award in auction.awards:
         check_award_status(request, award, now)
-        for complaint in award.complaints:
-            check_complaint_status(request, complaint, now)
-    if not auction.lots and auction.status == 'active.tendering' and auction.tenderPeriod.endDate <= now:
+    if auction.status == 'active.tendering' and auction.tenderPeriod.endDate <= now:
         LOGGER.info('Switched auction {} to {}'.format(auction['id'], 'active.auction'),
                     extra=context_unpack(request, {'MESSAGE_ID': 'switched_auction_active.auction'}))
         auction.status = 'active.auction'
         remove_draft_bids(request)
         check_bids(request)
-        if 1:
-            auction.auctionPeriod.startDate = None
+        # if auction.numberOfBids < 2 and auction.auctionPeriod:
+        #     auction.auctionPeriod.startDate = None
         return
-    elif auction.lots and auction.status == 'active.tendering' and auction.tenderPeriod.endDate <= now:
-        LOGGER.info('Switched auction {} to {}'.format(auction['id'], 'active.auction'),
-                    extra=context_unpack(request, {'MESSAGE_ID': 'switched_auction_active.auction'}))
-        auction.status = 'active.auction'
-        remove_draft_bids(request)
-        check_bids(request)
-        [setattr(i.auctionPeriod, 'startDate', None) for i in auction.lots if 1]
-        return
-    elif not auction.lots and auction.status == 'active.awarded':
-        standStillEnds = [
-            a.complaintPeriod.endDate.astimezone(TZ)
-            for a in auction.awards
-            if a.complaintPeriod.endDate
-        ]
-        if not standStillEnds:
-            return
-        standStillEnd = max(standStillEnds)
-        if standStillEnd <= now:
-            check_auction_status(request)
-    elif auction.lots and auction.status in ['active.qualification', 'active.awarded']:
-        if any([i['status'] in auction.block_complaint_status and i.relatedLot is None for i in auction.complaints]):
-            return
-        for lot in auction.lots:
-            if lot['status'] != 'active':
-                continue
-            lot_awards = [i for i in auction.awards if i.lotID == lot.id]
-            standStillEnds = [
-                a.complaintPeriod.endDate.astimezone(TZ)
-                for a in lot_awards
-                if a.complaintPeriod.endDate
-            ]
-            if not standStillEnds:
-                continue
-            standStillEnd = max(standStillEnds)
-            if standStillEnd <= now:
-                check_auction_status(request)
-                return
 
 
 def invalidate_bids_under_threshold(auction):
@@ -130,9 +83,6 @@ def create_awards(request):
             'suppliers': bid['tenderers'],
             'complaintPeriod': {'startDate': now}
         })
-        if bid['status'] == 'invalid':
-            award.status = 'unsuccessful'
-            award.complaintPeriod.endDate = now
         if award.status == 'pending.verification':
             award.signingPeriod = award.paymentPeriod = award.verificationPeriod = {'startDate': now}
             request.response.headers['Location'] = request.route_url('{}:Auction Awards'.format(auction.procurementMethodType), auction_id=auction.id, award_id=award['id'])
