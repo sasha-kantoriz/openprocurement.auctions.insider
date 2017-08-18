@@ -411,10 +411,9 @@ msgstr "ціле число"
 
 #: ../../source/standard/auction.rst:49
 msgid ""
-"The number which represents what time (from 1 up to 8) tender is taking place."
+"The number which represents what time tender is taking place."
 msgstr ""
-"Число, що вказує на кількість спроб виставлення лоту. Загалом, лот може "
-"виставлятися від 1 до 8 раз."
+"Число, що вказує на кількість спроб виставлення лоту."
 
 #~ msgid ""
 #~ "Total available auction budget. Bids lower than ``value`` will be rejected."
