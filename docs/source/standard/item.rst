@@ -26,11 +26,10 @@ Schema
 
     |ocdsDescription|
     The primary classification for the item. See the
-    `itemClassificationScheme` to identify preferred classification lists,
-    including CAV and GSIN.
+    `itemClassificationScheme` to identify preferred classification lists.
 
-    It is required for `classification.scheme` to be `CAV`. The
-    `classification.id` should be valid CAV code.
+    It is required for `classification.scheme` to be `CPV`. The
+    `classification.id` should be valid CPV code.
 
 :additionalClassifications:
     List of :ref:`Classification` objects
@@ -41,7 +40,7 @@ Schema
     This may also be used to present codes from an internal classification
     scheme.
 
-    It is required to have at least one item with `ДКПП` as `scheme`.
+    One of the possible additional classifiers is CPVS.
 
 :unit:
     :ref:`Unit`
@@ -59,7 +58,7 @@ Schema
 :address:
     :ref:`Address`
 
-    Address, where property (for ``dgfOtherAssets``) or asset(s) (for ``dgfFinancialAssets``) is located.
+    Address, where property or asset(s) is located.
 
 :location:
     dictionary
