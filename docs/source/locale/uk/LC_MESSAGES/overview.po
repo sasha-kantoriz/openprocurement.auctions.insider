@@ -20,6 +20,10 @@ msgstr "Огляд"
 msgid "Conventions"
 msgstr "Домовленості"
 
+msgid "The procedure to be used is **dgfInsider** which states for the insolvent bank property and the creditor claim right."
+msgstr "Використовується процедура **dgfInsider**, в межах якої оголошуються аукціони з продажу майна банків "
+"та прав вимоги за кредитами."
+
 msgid ""
 "If something went wrong during the request, we'll get a different status "
 "code and the JSON returned will have an `errors` field at the top level "
