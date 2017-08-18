@@ -223,20 +223,16 @@ msgstr "`illustration` - **Ілюстрації**"
 
 #: ../../source/standard/document.rst:43
 msgid ""
-"`virtualDataRoom` - **Virtual Data Room** (available only for the "
-"`dgfFinancialAssets` procedure, see :ref:`fintutorial`)"
+"`virtualDataRoom` - **Virtual Data Room**"
 msgstr ""
 "`virtualDataRoom` - **Віртуальна кімната для роботи з конфіденційними "
-"даними** (доступно лише для `dgfFinancialAssets` процедури, див. "
-":ref:`fintutorial`)"
+"даними**"
 
 #: ../../source/standard/document.rst:94
 msgid ""
-"`financialLicense` - **License** (available only for the "
-"`dgfFinancialAssets` procedure, see :ref:`fintutorial`)"
+"`financialLicense` - **License**"
 msgstr ""
-"`financialLicense` - **Ліцензія**  (доступно лише для `dgfFinancialAssets` "
-"процедури, див. :ref:`fintutorial`)"
+"`financialLicense` - **Ліцензія**"
 
 #: ../../source/standard/document.rst:114
 msgid "integer"
