@@ -15,8 +15,7 @@ from openprocurement.auctions.dgf.models import (
     Organization
 )
 
-from urllib import quote
-from base64 import b64encode
+from openprocurement.auctions.insider.utils import generate_participation_url
 
 
 class Bid(BaseBid):
@@ -46,11 +45,9 @@ class Bid(BaseBid):
     @serializable(serialized_name="participationUrl", serialize_when_none=False)
     def participation_url(self):
         if not self.participationUrl and self.status != "draft":
-            auction = get_auction(self)
-            request = auction.__parent__.request
-            auction_url = request.registry.auction_module_url
-            signature = quote(b64encode(request.registry.signer.signature(self.id)))
-            return '{}/auctions/{}/login?bidder_id={}&signature={}'.format(auction_url, auction.id, self.id, signature)
+            request = get_auction(self).__parent__.request
+            url = generate_participation_url(request, self.id)
+            return url
 
 
 @implementer(IAuction)

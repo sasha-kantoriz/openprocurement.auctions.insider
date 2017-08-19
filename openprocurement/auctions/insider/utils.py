@@ -10,9 +10,19 @@ from openprocurement.auctions.core.utils import (
 from openprocurement.auctions.dgf.utils import check_award_status
 from barbecue import chef
 
+from urllib import quote
+from base64 import b64encode
+
 
 PKG = get_distribution(__package__)
 LOGGER = getLogger(PKG.project_name)
+
+
+def generate_participation_url(request, bid_id):
+    auction_module_url = request.registry.auction_module_url
+    auction_id = request.validated['auction_id']
+    signature = quote(b64encode(request.registry.signer.signature(bid_id)))
+    return '{}/auctions/{}/login?bidder_id={}&signature={}'.format(auction_module_url, auction_id, bid_id, signature)
 
 
 def check_bids(request):
