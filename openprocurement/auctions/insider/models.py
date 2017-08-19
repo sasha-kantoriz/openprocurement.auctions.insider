@@ -27,10 +27,6 @@ class Bid(BaseBid):
             'create': whitelist('tenderers', 'parameters', 'lotValues', 'status', 'qualified', 'eligible'),
         }
 
-    def validate_participationUrl(self, data, url):
-        if url and isinstance(data['__parent__'], Model) and get_auction(data['__parent__']).lots:
-            raise ValidationError(u"url should be posted for each lot of bid")
-
     def validate_value(self, data, value):
         if isinstance(data['__parent__'], Model):
             auction = data['__parent__']
@@ -49,19 +45,13 @@ class Bid(BaseBid):
 
     @serializable(serialized_name="participationUrl", serialize_when_none=False)
     def participation_url(self):
-        root = self.__parent__
-        auction_id = root.id
-        bidder_id = self.id
-        parents = []
-        while root.__parent__ is not None:
-            parents[0:0] = [root]
-            root = root.__parent__
-        request = root.request
-        auction_url = request.registry.auction_module_url
-        signature = quote(b64encode(request.registry.signer.signature(bidder_id)))
-        participation_url = '{}/auctions/{}/login?bidder_id={}&signature={}'.format(auction_url, auction_id, bidder_id, signature)
-        if not self.participationUrl:
-            return participation_url
+        if not self.participationUrl and self.status != "draft":
+            auction = get_auction(self)
+            request = auction.__parent__.request
+            auction_url = request.registry.auction_module_url
+            signature = quote(b64encode(request.registry.signer.signature(self.id)))
+            return '{}/auctions/{}/login?bidder_id={}&signature={}'.format(auction_url, auction.id, self.id, signature)
+
 
 @implementer(IAuction)
 class Auction(BaseAuction):
