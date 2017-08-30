@@ -3,6 +3,8 @@ Overview
 
 openprocurement.auctions.dutch contains documentaion for Deposit Guarantee Fund auctions.
 
+The procedure to be used is **dgfInsider** which states for the insolvent bank property and the creditor claim right.
+
 
 Features
 --------
