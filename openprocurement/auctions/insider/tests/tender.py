@@ -593,8 +593,8 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
                 tender_endDate = TZ.localize(tender_endDate)
             self.assertLessEqual((auction_startDate - tender_endDate).total_seconds(), 70)
         else:
-            self.assertEqual(parse_date(auction['tenderPeriod']['endDate']).date(), parse_date(data['auctionPeriod']['startDate'], TZ).date() - timedelta(days=1))
-            self.assertEqual(parse_date(auction['tenderPeriod']['endDate']).time(), time(20, 0))
+            self.assertEqual(parse_date(auction['tenderPeriod']['endDate']).date(), parse_date(data['auctionPeriod']['startDate'], TZ).date())
+            self.assertEqual(parse_date(auction['tenderPeriod']['endDate']).time(), time(15, 0))
 
 
     def test_create_auction_generated(self):

@@ -71,8 +71,8 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
             item = response.json['data']
         self.assertIn('auctionPeriod', item)
         self.assertIn('shouldStartAfter', item['auctionPeriod'])
-        self.assertGreaterEqual(item['auctionPeriod']['shouldStartAfter'], response.json['data']['tenderPeriod']['endDate'])
-        self.assertIn('T00:00:00+', item['auctionPeriod']['shouldStartAfter'])
+        self.assertGreaterEqual(response.json['data']['tenderPeriod']['endDate'], item['auctionPeriod']['shouldStartAfter'])
+        self.assertIn('T09:00:00+', item['auctionPeriod']['shouldStartAfter'])
         self.assertEqual(response.json['data']['next_check'], response.json['data']['tenderPeriod']['endDate'])
 
         if self.initial_lots:
@@ -105,7 +105,7 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
             item = response.json['data']
         self.assertIn('auctionPeriod', item)
         self.assertIn('shouldStartAfter', item['auctionPeriod'])
-        self.assertGreaterEqual(item['auctionPeriod']['shouldStartAfter'], response.json['data']['tenderPeriod']['endDate'])
+        self.assertGreaterEqual(response.json['data']['tenderPeriod']['endDate'], item['auctionPeriod']['shouldStartAfter'])
         self.assertEqual(response.json['data']['next_check'], response.json['data']['tenderPeriod']['endDate'])
 
         if self.initial_lots:
@@ -115,7 +115,7 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
             response = self.app.patch_json('/auctions/{}'.format(self.auction_id), {'data': {"auctionPeriod": {"startDate": "9999-01-01T00:00:00"}}})
             item = response.json['data']
         self.assertEqual(response.status, '200 OK')
-        self.assertGreaterEqual(item['auctionPeriod']['shouldStartAfter'], response.json['data']['tenderPeriod']['endDate'])
+        self.assertGreaterEqual(response.json['data']['tenderPeriod']['endDate'], item['auctionPeriod']['shouldStartAfter'])
         self.assertIn('9999-01-01T00:00:00', item['auctionPeriod']['startDate'])
 
         self.set_status('active.auction', {'status': 'active.tendering'})
