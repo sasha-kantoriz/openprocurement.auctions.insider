@@ -49,7 +49,7 @@ class InsiderAuctionTest(BaseInsiderWebTest):
             'procurementMethodType', 'procuringEntity',
             'submissionMethodDetails', 'submissionMethodDetails_en', 'submissionMethodDetails_ru',
             'title', 'title_en', 'title_ru', 'value', 'auctionPeriod',
-            'dgfDecisionDate', 'dgfDecisionID',
+            'dgfDecisionDate', 'dgfDecisionID','merchandisingObject',
         ])
         if SANDBOX_MODE:
             fields.add('procurementMethodDetails')
@@ -441,10 +441,8 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         self.assertIn({u'description': [u"Value must be one of ['open', 'selective', 'limited']."], u'location': u'body', u'name': u'procurementMethod'}, response.json['errors'])
         #self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'tenderPeriod'}, response.json['errors'])
         self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'minimalStep'}, response.json['errors'])
-        self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'items'}, response.json['errors'])
         #self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'enquiryPeriod'}, response.json['errors'])
         self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'value'}, response.json['errors'])
-        self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'items'}, response.json['errors'])
 
         response = self.app.post_json(request_path, {'data': {'enquiryPeriod': {'endDate': 'invalid_value'}, 'procurementMethodType': self.initial_data['procurementMethodType']}}, status=422)
         self.assertEqual(response.status, '422 Unprocessable Entity')
