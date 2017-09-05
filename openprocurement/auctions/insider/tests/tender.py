@@ -441,7 +441,7 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         self.assertEqual(response.json['status'], 'error')
         self.assertIn({u'description': [u"Value must be one of ['open', 'selective', 'limited']."], u'location': u'body', u'name': u'procurementMethod'}, response.json['errors'])
         #self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'tenderPeriod'}, response.json['errors'])
-        self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'minimalStep'}, response.json['errors'])
+        # self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'minimalStep'}, response.json['errors'])
         #self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'enquiryPeriod'}, response.json['errors'])
         self.assertIn({u'description': [u'This field is required.'], u'location': u'body', u'name': u'value'}, response.json['errors'])
 
@@ -515,50 +515,50 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         self.assertEqual(response.json['errors'], [
             {u'description': [u'period should begin after auctionPeriod'], u'location': u'body', u'name': u'awardPeriod'}
         ])
-
-        data = self.initial_data['minimalStep']
-        self.initial_data['minimalStep'] = {'amount': '1000.0'}
-        response = self.app.post_json(request_path, {'data': self.initial_data}, status=422)
-        self.initial_data['minimalStep'] = data
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': [u'value should be less than value of auction'], u'location': u'body', u'name': u'minimalStep'}
-        ])
-
-        data = self.initial_data['minimalStep']
-        self.initial_data['minimalStep'] = {'amount': '100.0', 'valueAddedTaxIncluded': False}
-        response = self.app.post_json(request_path, {'data': self.initial_data}, status=422)
-        self.initial_data['minimalStep'] = data
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': [u'valueAddedTaxIncluded should be identical to valueAddedTaxIncluded of value of auction'], u'location': u'body', u'name': u'minimalStep'}
-        ])
-
-        data = self.initial_data['minimalStep']
-        self.initial_data['minimalStep'] = {'amount': '100.0', 'currency': "USD"}
-        response = self.app.post_json(request_path, {'data': self.initial_data}, status=422)
-        self.initial_data['minimalStep'] = data
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': [u'currency should be identical to currency of value of auction'], u'location': u'body', u'name': u'minimalStep'}
-        ])
-
-        auction_data = deepcopy(self.initial_data)
-        auction_data['value'] = {'amount': '100.0', 'currency': "USD"}
-        auction_data['minimalStep'] = {'amount': '5.0', 'currency': "USD"}
-        response = self.app.post_json(request_path, {'data': auction_data}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': [u'currency should be only UAH'], u'location': u'body', u'name': u'value'}
-        ])
+        #
+        # data = self.initial_data['minimalStep']
+        # self.initial_data['minimalStep'] = {'amount': '1000.0'}
+        # response = self.app.post_json(request_path, {'data': self.initial_data}, status=422)
+        # self.initial_data['minimalStep'] = data
+        # self.assertEqual(response.status, '422 Unprocessable Entity')
+        # self.assertEqual(response.content_type, 'application/json')
+        # self.assertEqual(response.json['status'], 'error')
+        # self.assertEqual(response.json['errors'], [
+        #     {u'description': [u'value should be less than value of auction'], u'location': u'body', u'name': u'minimalStep'}
+        # ])
+        #
+        # data = self.initial_data['minimalStep']
+        # self.initial_data['minimalStep'] = {'amount': '100.0', 'valueAddedTaxIncluded': False}
+        # response = self.app.post_json(request_path, {'data': self.initial_data}, status=422)
+        # self.initial_data['minimalStep'] = data
+        # self.assertEqual(response.status, '422 Unprocessable Entity')
+        # self.assertEqual(response.content_type, 'application/json')
+        # self.assertEqual(response.json['status'], 'error')
+        # self.assertEqual(response.json['errors'], [
+        #     {u'description': [u'valueAddedTaxIncluded should be identical to valueAddedTaxIncluded of value of auction'], u'location': u'body', u'name': u'minimalStep'}
+        # ])
+        #
+        # data = self.initial_data['minimalStep']
+        # self.initial_data['minimalStep'] = {'amount': '100.0', 'currency': "USD"}
+        # response = self.app.post_json(request_path, {'data': self.initial_data}, status=422)
+        # self.initial_data['minimalStep'] = data
+        # self.assertEqual(response.status, '422 Unprocessable Entity')
+        # self.assertEqual(response.content_type, 'application/json')
+        # self.assertEqual(response.json['status'], 'error')
+        # self.assertEqual(response.json['errors'], [
+        #     {u'description': [u'currency should be identical to currency of value of auction'], u'location': u'body', u'name': u'minimalStep'}
+        # ])
+        #
+        # auction_data = deepcopy(self.initial_data)
+        # auction_data['value'] = {'amount': '100.0', 'currency': "USD"}
+        # auction_data['minimalStep'] = {'amount': '5.0', 'currency': "USD"}
+        # response = self.app.post_json(request_path, {'data': auction_data}, status=422)
+        # self.assertEqual(response.status, '422 Unprocessable Entity')
+        # self.assertEqual(response.content_type, 'application/json')
+        # self.assertEqual(response.json['status'], 'error')
+        # self.assertEqual(response.json['errors'], [
+        #     {u'description': [u'currency should be only UAH'], u'location': u'body', u'name': u'value'}
+        # ])
 
         data = self.initial_data["procuringEntity"]["contactPoint"]["telephone"]
         del self.initial_data["procuringEntity"]["contactPoint"]["telephone"]
@@ -663,12 +663,13 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
             self.assertEqual(set(auction) - set(self.initial_data), set([
                 u'id', u'dateModified', u'auctionID', u'date', u'status', u'procurementMethod', 'documents',
                 u'awardCriteria', u'submissionMethod', u'next_check', u'owner', u'enquiryPeriod', u'tenderPeriod',
-                u'eligibilityCriteria_en', u'eligibilityCriteria', u'eligibilityCriteria_ru',
+                u'eligibilityCriteria_en', u'eligibilityCriteria', u'eligibilityCriteria_ru', u'minimalStep'
             ]))
         else:
             self.assertEqual(set(auction) - set(self.initial_data), set([
                 u'id', u'dateModified', u'auctionID', u'date', u'status', u'procurementMethod', 'documents',
                 u'awardCriteria', u'submissionMethod', u'next_check', u'owner', u'enquiryPeriod', u'tenderPeriod',
+                u'minimalStep'
             ]))
         self.assertIn(auction['id'], response.headers['Location'])
 
