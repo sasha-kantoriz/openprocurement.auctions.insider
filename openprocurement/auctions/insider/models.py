@@ -52,7 +52,7 @@ class Auction(BaseAuction):
     """Data regarding auction process - publicly inviting prospective contractors to submit bids for evaluation and selecting a winner or winners."""
     procurementMethodType = StringType(default="dgfInsider")
     bids = ListType(ModelType(Bid), default=list())  # A list of all the companies who entered submissions for the auction.
-    minimalStep = ModelType(Value, required=True)
+    minimalStep = ModelType(Value)
 
     @serializable(serialized_name="minimalStep", type=ModelType(Value))
     def auction_minimalStep(self):
