@@ -578,7 +578,7 @@ class InsiderAuctionAwardProcessTest(BaseInsiderAuctionWebTest):
         response = self.app.get('/auctions/{}/awards/{}'.format(self.auction_id, self.second_award_id))
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["value"]["amount"], 270)
+        self.assertEqual(response.json['data']["value"]["amount"], 200)
 
         response = self.app.patch_json('/auctions/{}/awards/{}'.format(self.auction_id, self.second_award_id), {"data": {"status": "unsuccessful"}}, status=403)
         self.assertEqual(response.status, '403 Forbidden')
@@ -668,7 +668,7 @@ class InsiderAuctionAwardProcessTest(BaseInsiderAuctionWebTest):
         response = self.app.get('/auctions/{}/awards/{}'.format(self.auction_id, self.second_award_id))
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["value"]["amount"], 270)
+        self.assertEqual(response.json['data']["value"]["amount"], 200)
 
     def test_complate_auction_with_second_award2(self):
         self.upload_auction_protocol(self.first_award)
@@ -698,7 +698,7 @@ class InsiderAuctionAwardProcessTest(BaseInsiderAuctionWebTest):
         response = self.app.get('/auctions/{}/awards/{}'.format(self.auction_id, self.second_award_id))
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["value"]["amount"], 270)
+        self.assertEqual(response.json['data']["value"]["amount"], 200)
 
     def test_complate_auction_with_second_award3(self):
         self.upload_auction_protocol(self.first_award)
@@ -732,7 +732,7 @@ class InsiderAuctionAwardProcessTest(BaseInsiderAuctionWebTest):
         response = self.app.get('/auctions/{}/awards/{}'.format(self.auction_id, self.second_award_id))
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["value"]["amount"], 270)
+        self.assertEqual(response.json['data']["value"]["amount"], 200)
 
     def test_successful_second_auction_award(self):
         request_path = '/auctions/{}/awards'.format(self.auction_id)
@@ -774,7 +774,7 @@ class InsiderAuctionAwardProcessTest(BaseInsiderAuctionWebTest):
         response = self.app.get('/auctions/{}/awards/{}'.format(self.auction_id, self.second_award_id))
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']["value"]["amount"], 270)
+        self.assertEqual(response.json['data']["value"]["amount"], 200)
 
     def test_unsuccessful_auction1(self):
         response = self.app.patch_json('/auctions/{}/awards/{}?acc_token=1'.format(self.auction_id, self.second_award_id), {"data": {"status": "cancelled"}}, status=403)

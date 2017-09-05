@@ -9,7 +9,7 @@ from zope.interface import implementer
 from openprocurement.api.models import (
     Model, ListType
 )
-from openprocurement.api.models import TZ, get_now, SANDBOX_MODE
+from openprocurement.api.models import TZ, get_now, SANDBOX_MODE , Value
 from openprocurement.api.utils import calculate_business_date
 from openprocurement.auctions.core.models import IAuction
 from openprocurement.auctions.flash.models import calc_auction_end_time
@@ -100,6 +100,7 @@ class Auction(BaseAuction):
     procurementMethodType = StringType(default="dgfInsider")
     bids = ListType(ModelType(Bid), default=list())  # A list of all the companies who entered submissions for the auction.
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
+    minimalStep = ModelType(Value, required=True)
 
     def initialize(self):
         if not self.enquiryPeriod:
@@ -116,6 +117,12 @@ class Auction(BaseAuction):
             for lot in self.lots:
                 lot.date = now
         self.documents.append(type(self).documents.model_class(DGF_PLATFORM_LEGAL_DETAILS))
+
+    @serializable(serialized_name="minimalStep", type=ModelType(Value))
+    def auction_minimalStep(self):
+        return Value(dict(amount=min([0 for i in self.lots]),
+                          currency=self.minimalStep.currency,
+                          valueAddedTaxIncluded=self.minimalStep.valueAddedTaxIncluded)) if self.lots else Value(dict(amount=0))
 
 DGFInsider = Auction
 

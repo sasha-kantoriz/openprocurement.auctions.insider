@@ -293,6 +293,7 @@ class InsiderAuctionBidInvalidationAuctionResourceTest(BaseInsiderAuctionWebTest
         for i in range(3)
     ]
 
+    @unittest.skip("zero minimalstep")
     def test_post_auction_all_invalid_bids(self):
         self.app.authorization = ('Basic', ('auction', ''))
 
