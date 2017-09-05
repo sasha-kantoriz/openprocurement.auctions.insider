@@ -8,6 +8,7 @@ from zope.interface import implementer
 from openprocurement.api.models import (
     Model, ListType
 )
+from openprocurement.api.models import TZ, get_now, SANDBOX_MODE , Value
 from openprocurement.auctions.core.models import IAuction
 from openprocurement.auctions.dgf.models import (
     DGFFinancialAssets as BaseAuction,
@@ -55,8 +56,13 @@ class Auction(BaseAuction):
     """Data regarding auction process - publicly inviting prospective contractors to submit bids for evaluation and selecting a winner or winners."""
     procurementMethodType = StringType(default="dgfInsider")
     bids = ListType(ModelType(Bid), default=list())  # A list of all the companies who entered submissions for the auction.
+    minimalStep = ModelType(Value, required=True)
 
-
+    @serializable(serialized_name="minimalStep", type=ModelType(Value))
+    def auction_minimalStep(self):
+        return Value(dict(amount=min([0 for i in self.lots]),
+                          currency=self.minimalStep.currency,
+                          valueAddedTaxIncluded=self.minimalStep.valueAddedTaxIncluded)) if self.lots else Value(dict(amount=0))
 
 DGFInsider = Auction
 

@@ -240,7 +240,7 @@ class InsiderAuctionContractResourceTest(BaseInsiderAuctionWebTest):
 
         response = self.app.patch_json('/auctions/{}/contracts/{}'.format(self.auction_id, contract['id']), {"data": {"value": {"amount": 99}}}, status=403)
         self.assertEqual(response.status, '403 Forbidden')
-        self.assertEqual(response.json['errors'][0]["description"], "Value amount should be greater or equal to awarded amount (270.0)")
+        self.assertEqual(response.json['errors'][0]["description"], "Value amount should be greater or equal to awarded amount (200.0)")
 
         response = self.app.patch_json('/auctions/{}/contracts/{}'.format(self.auction_id, contract['id']), {"data": {"value": {"amount": 500}}})
         self.assertEqual(response.status, '200 OK')
