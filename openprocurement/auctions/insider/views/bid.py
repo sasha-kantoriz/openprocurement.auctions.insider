@@ -49,6 +49,8 @@ class InsiderAuctionBidResource(FinancialAuctionBidResource):
             }
 
         """
+        # Delete bid permission where deny for everyone
+        # For return possibility delete bid remove this function
         bid = self.request.context
         if self.request.validated['auction_status'] != 'active.tendering':
             self.request.errors.add('body', 'data', 'Can\'t delete bid in current ({}) auction status'.format(self.request.validated['auction_status']))

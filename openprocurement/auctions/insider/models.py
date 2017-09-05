@@ -9,8 +9,8 @@ from zope.interface import implementer
 from openprocurement.api.models import (
     Model, ListType
 )
-from openprocurement.api.models import TZ, get_now, SANDBOX_MODE , Value
 from openprocurement.api.utils import calculate_business_date
+from openprocurement.api.models import TZ, get_now, SANDBOX_MODE, Value
 from openprocurement.auctions.core.models import IAuction
 from openprocurement.auctions.flash.models import calc_auction_end_time
 from openprocurement.auctions.dgf.models import (
@@ -73,18 +73,14 @@ class Bid(BaseBid):
     def validate_value(self, data, value):
         if isinstance(data['__parent__'], Model):
             auction = data['__parent__']
-            if auction.lots:
-                if value:
-                    raise ValidationError(u"value should be posted for each lot of bid")
-            else:
-                if not value:
-                    return
-                if auction.value.amount > value.amount:
-                    raise ValidationError(u"value of bid should be greater than value of auction")
-                if auction.get('value').currency != value.currency:
-                    raise ValidationError(u"currency of bid should be identical to currency of value of auction")
-                if auction.get('value').valueAddedTaxIncluded != value.valueAddedTaxIncluded:
-                    raise ValidationError(u"valueAddedTaxIncluded of bid should be identical to valueAddedTaxIncluded of value of auction")
+            if not value:
+                return
+            if auction.value.amount > value.amount:
+                raise ValidationError(u"value of bid should be greater than value of auction")
+            if auction.get('value').currency != value.currency:
+                raise ValidationError(u"currency of bid should be identical to currency of value of auction")
+            if auction.get('value').valueAddedTaxIncluded != value.valueAddedTaxIncluded:
+                raise ValidationError(u"valueAddedTaxIncluded of bid should be identical to valueAddedTaxIncluded of value of auction")
 
     @serializable(serialized_name="participationUrl", serialize_when_none=False)
     def participation_url(self):
@@ -100,7 +96,7 @@ class Auction(BaseAuction):
     procurementMethodType = StringType(default="dgfInsider")
     bids = ListType(ModelType(Bid), default=list())  # A list of all the companies who entered submissions for the auction.
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
-    minimalStep = ModelType(Value, required=True)
+    minimalStep = ModelType(Value)
 
     def initialize(self):
         if not self.enquiryPeriod:
@@ -120,9 +116,7 @@ class Auction(BaseAuction):
 
     @serializable(serialized_name="minimalStep", type=ModelType(Value))
     def auction_minimalStep(self):
-        return Value(dict(amount=min([0 for i in self.lots]),
-                          currency=self.minimalStep.currency,
-                          valueAddedTaxIncluded=self.minimalStep.valueAddedTaxIncluded)) if self.lots else Value(dict(amount=0))
+        return Value(dict(amount=0))
 
 DGFInsider = Auction
 
