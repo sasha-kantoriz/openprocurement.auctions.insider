@@ -7,6 +7,7 @@ from iso8601 import parse_date
 
 from openprocurement.api.utils import ROUTE_PREFIX
 from openprocurement.api.models import get_now, SANDBOX_MODE, TZ
+from openprocurement.auctions.dgf.constants import ELIGIBILITY_CRITERIA
 from openprocurement.auctions.insider.models import DGFInsider
 from openprocurement.auctions.insider.tests.base import (
     test_insider_auction_data, test_insider_auction_data,
@@ -616,9 +617,9 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         self.assertNotEqual(data['doc_id'], auction['id'])
         self.assertNotEqual(data['auctionID'], auction['auctionID'])
 
-        self.assertEqual(auction['eligibilityCriteria'], u"До участі допускаються лише ліцензовані фінансові установи.")
-        self.assertEqual(auction['eligibilityCriteria_en'], u"Only licensed financial institutions are eligible to participate.")
-        self.assertEqual(auction['eligibilityCriteria_ru'], u"К участию допускаются только лицензированные финансовые учреждения.")
+        self.assertEqual(auction['eligibilityCriteria'], ELIGIBILITY_CRITERIA['ua'])
+        self.assertEqual(auction['eligibilityCriteria_en'], ELIGIBILITY_CRITERIA['en'])
+        self.assertEqual(auction['eligibilityCriteria_ru'], ELIGIBILITY_CRITERIA['ru'])
 
     def test_create_auction_draft(self):
         data = self.initial_data.copy()
