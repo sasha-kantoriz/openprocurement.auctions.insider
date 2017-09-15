@@ -44,8 +44,8 @@ msgstr ":ref:`genindex`"
 msgid ":ref:`search`"
 msgstr ":ref:`search`"
 
-msgid "Welcome to openprocurement.auctions.dutch documentation!"
-msgstr "Вітаємо на сайті документації по openprocurement.auctions.dutch!"
+msgid "Welcome to openprocurement.auctions.insider documentation!"
+msgstr "Вітаємо на сайті документації по openprocurement.auctions.insider!"
 
 msgid ""
 "Please report any problems or suggestions for improvement either via the "
