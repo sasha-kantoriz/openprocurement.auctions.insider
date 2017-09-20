@@ -401,19 +401,23 @@ msgstr ""
 
 #~ msgid "The name of the auction, displayed in listings."
 #~ msgstr "Назва аукціону, яка відображається у списках."
-#: ../../source/standard/auction.rst:109
 msgid "Auction step (increment). Validation rules:"
 msgstr "Крок аукціону та порядок підвищення ціни. Правила валідації:"
 
-#: ../../source/standard/auction.rst:47
 msgid "integer"
 msgstr "ціле число"
 
-#: ../../source/standard/auction.rst:49
 msgid ""
 "The number which represents what time tender is taking place."
 msgstr ""
 "Число, що вказує на кількість спроб виставлення лоту."
+
+msgid "Auction announcement."
+msgstr "Оголошення аукціону."
+
+msgid "Auction starting price."
+msgstr "Початкова ціна аукціону."
+
 
 #~ msgid ""
 #~ "Total available auction budget. Bids lower than ``value`` will be rejected."
