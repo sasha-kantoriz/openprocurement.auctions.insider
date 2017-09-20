@@ -32,8 +32,6 @@ class Bid(BaseBid):
             auction = data['__parent__']
             if not value:
                 return
-            if auction.value.amount > value.amount:
-                raise ValidationError(u"value of bid should be greater than value of auction")
             if auction.get('value').currency != value.currency:
                 raise ValidationError(u"currency of bid should be identical to currency of value of auction")
             if auction.get('value').valueAddedTaxIncluded != value.valueAddedTaxIncluded:

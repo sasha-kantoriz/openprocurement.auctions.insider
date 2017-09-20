@@ -27,11 +27,6 @@ def generate_auction_url(request, bid_id=None):
     return '{}/insider-auctions/{}'.format(auction_module_url, auction_id)
 
 
-def check_bids(request):
-    auction = request.validated['auction']
-    auction.status = 'unsuccessful'
-
-
 def check_auction_status(request):
     auction = request.validated['auction']
     if auction.awards:
@@ -53,7 +48,7 @@ def check_status(request):
     now = get_now()
     for award in auction.awards:
         check_award_status(request, award, now)
-    if auction.status == 'active.tendering' and auction.tenderPeriod.endDate <= now:
+    if auction.status == 'active.tendering' and auction.enquiryPeriod.endDate <= now:
         LOGGER.info('Switched auction {} to {}'.format(auction['id'], 'active.auction'),
                     extra=context_unpack(request, {'MESSAGE_ID': 'switched_auction_active.auction'}))
         auction.status = 'active.auction'
@@ -61,13 +56,17 @@ def check_status(request):
         remove_draft_bids(request)
         check_bids(request)
         return
-
-
-def invalidate_bids_under_threshold(auction):
-    value_threshold = round(auction['value']['amount'] + auction['minimalStep']['amount'], 2)
-    for bid in auction['bids']:
-        if not bid.get('value') or bid['value']['amount'] < value_threshold:
-            bid['status'] = 'invalid'
+    elif auction.status == 'active.awarded':
+        standStillEnds = [
+            a.complaintPeriod.endDate.astimezone(TZ)
+            for a in auction.awards
+            if a.complaintPeriod.endDate
+        ]
+        if not standStillEnds:
+            return
+        standStillEnd = max(standStillEnds)
+        if standStillEnd <= now:
+            check_auction_status(request)
 
 
 def create_awards(request):
@@ -76,7 +75,6 @@ def create_awards(request):
     now = get_now()
     auction.awardPeriod = type(auction).awardPeriod({'startDate': now})
     valid_bids = [bid for bid in auction.bids if bid['status'] != 'invalid']
-
     bids = chef(valid_bids, auction.features or [], [], True)
 
     for bid, status in zip(bids, ['pending.verification', 'pending.waiting']):
@@ -94,3 +92,9 @@ def create_awards(request):
             award.signingPeriod = award.paymentPeriod = award.verificationPeriod = {'startDate': now}
             request.response.headers['Location'] = request.route_url('{}:Auction Awards'.format(auction.procurementMethodType), auction_id=auction.id, award_id=award['id'])
         auction.awards.append(award)
+
+
+def invalidate_empty_bids(auction):
+    for bid in auction['bids']:
+        if not bid.get('value'):
+            bid['status'] = 'invalid'

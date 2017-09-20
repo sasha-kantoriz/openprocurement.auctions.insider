@@ -8,8 +8,8 @@
 .. meta::
     :google-site-verification: kmqHGqhpzgef4t5OVKoQCPa5v-CK14HOLmVrZV2QgmQ
 
-Welcome to openprocurement.auctions.dutch documentation!
-========================================================
+Welcome to openprocurement.auctions.insider documentation!
+==========================================================
 
 Please report any problems or suggestions for improvement either via the
 `mailing list <http://groups.google.com/group/open-procurement-general>`_ or
