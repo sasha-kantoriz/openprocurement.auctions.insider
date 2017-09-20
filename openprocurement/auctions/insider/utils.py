@@ -54,7 +54,6 @@ def check_status(request):
         auction.status = 'active.auction'
         auction.auctionUrl = generate_auction_url(request)
         remove_draft_bids(request)
-        check_bids(request)
         return
     elif auction.status == 'active.awarded':
         standStillEnds = [
