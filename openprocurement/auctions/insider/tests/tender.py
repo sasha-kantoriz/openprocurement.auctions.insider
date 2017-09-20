@@ -1111,24 +1111,11 @@ class InsiderAuctionProcessTest(BaseInsiderAuctionWebTest):
         self.app.authorization = ('Basic', ('auction', ''))
         response = self.app.get('/auctions/{}/auction'.format(auction_id))
         auction_bids_data = response.json['data']['bids']
-        # posting auction urls
-        response = self.app.patch_json('/auctions/{}/auction'.format(auction_id),
-                                       {
-                                           'data': {
-                                               'auctionUrl': 'https://auction.auction.url',
-                                               'bids': [
-                                                   {
-                                                       'id': i['id'],
-                                                       'participationUrl': 'https://auction.auction.url/for_bid/{}'.format(i['id'])
-                                                   }
-                                                   for i in auction_bids_data
-                                               ]
-                                           }
-        })
-        # view bid participationUrl
+
+        # check bid participationUrl
         self.app.authorization = ('Basic', ('broker', ''))
         response = self.app.get('/auctions/{}/bids/{}?acc_token={}'.format(auction_id, bid_id, bid_token))
-        self.assertEqual(response.json['data']['participationUrl'], 'https://auction.auction.url/for_bid/{}'.format(bid_id))
+        self.assertIn('participationUrl', response.json['data'])
 
         # posting auction results
         self.app.authorization = ('Basic', ('auction', ''))
@@ -1269,6 +1256,34 @@ class InsiderAuctionProcessTest(BaseInsiderAuctionWebTest):
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['errors'][0]["description"], "Can't update document in current (complete) auction status")
 
+    def test_auctionUrl_in_active_auction(self):
+        self.app.authorization = ('Basic', ('broker', ''))
+        # empty auctions listing
+        response = self.app.get('/auctions')
+        self.assertEqual(response.json['data'], [])
+        # create auction
+        response = self.app.post_json('/auctions',
+                                      {"data": self.initial_data})
+        auction_id = self.auction_id = response.json['data']['id']
+        owner_token = response.json['access']['token']
+        # switch to active.tendering
+        response = self.set_status('active.tendering', {"auctionPeriod": {"startDate": (get_now() + timedelta(days=10)).isoformat()}})
+        self.assertIn("auctionPeriod", response.json['data'])
+        # create bid
+        self.app.authorization = ('Basic', ('broker', ''))
+        if self.initial_organization == test_financial_organization:
+            response = self.app.post_json('/auctions/{}/bids'.format(auction_id),
+                                          {'data': {'tenderers': [self.initial_organization], 'qualified': True, 'eligible': True}})
+        else:
+            response = self.app.post_json('/auctions/{}/bids'.format(auction_id),
+                                          {'data': {'tenderers': [self.initial_organization], 'qualified': True}})
+        # switch to active.qualification
+        self.set_status('active.auction', {'status': 'active.tendering'})
+        self.app.authorization = ('Basic', ('chronograph', ''))
+        response = self.app.patch_json('/auctions/{}'.format(auction_id), {"data": {"id": auction_id}})
+        self.assertIn('auctionUrl', response.json['data'])
+        self.assertIn(auction_id, response.json['data']['auctionUrl'])
+
     def test_suspended_auction(self):
         self.app.authorization = ('Basic', ('broker', ''))
         # empty auctions listing
@@ -1349,24 +1364,11 @@ class InsiderAuctionProcessTest(BaseInsiderAuctionWebTest):
         self.app.authorization = ('Basic', ('auction', ''))
         response = self.app.get('/auctions/{}/auction'.format(auction_id))
         auction_bids_data = response.json['data']['bids']
-        # posting auction urls
-        response = self.app.patch_json('/auctions/{}/auction'.format(auction_id),
-                                       {
-                                           'data': {
-                                               'auctionUrl': 'https://auction.auction.url',
-                                               'bids': [
-                                                   {
-                                                       'id': i['id'],
-                                                       'participationUrl': 'https://auction.auction.url/for_bid/{}'.format(i['id'])
-                                                   }
-                                                   for i in auction_bids_data
-                                               ]
-                                           }
-        })
-        # view bid participationUrl
+
+        # check bid participationUrl
         self.app.authorization = ('Basic', ('broker', ''))
         response = self.app.get('/auctions/{}/bids/{}?acc_token={}'.format(auction_id, bid_id, bid_token))
-        self.assertEqual(response.json['data']['participationUrl'], 'https://auction.auction.url/for_bid/{}'.format(bid_id))
+        self.assertIn('participationUrl', response.json['data'])
 
         # posting auction results
         self.app.authorization = ('Basic', ('auction', ''))
