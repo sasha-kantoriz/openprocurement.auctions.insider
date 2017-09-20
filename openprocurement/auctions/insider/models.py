@@ -2,13 +2,13 @@
 from schematics.types import StringType
 from schematics.types.compound import ModelType
 from schematics.exceptions import ValidationError
-from schematics.transforms import  whitelist
+from schematics.transforms import whitelist
 from schematics.types.serializable import serializable
 from zope.interface import implementer
 from openprocurement.api.models import (
     Model, ListType
 )
-from openprocurement.api.models import TZ, get_now, SANDBOX_MODE, Value
+from openprocurement.api.models import Value
 from openprocurement.auctions.core.models import IAuction
 from openprocurement.auctions.dgf.models import (
     DGFFinancialAssets as BaseAuction,
@@ -16,7 +16,7 @@ from openprocurement.auctions.dgf.models import (
     Organization
 )
 
-from openprocurement.auctions.insider.utils import generate_participation_url
+from openprocurement.auctions.insider.utils import generate_auction_url
 
 
 class Bid(BaseBid):
@@ -43,7 +43,7 @@ class Bid(BaseBid):
     def participation_url(self):
         if not self.participationUrl and self.status != "draft":
             request = get_auction(self).__parent__.request
-            url = generate_participation_url(request, self.id)
+            url = generate_auction_url(request, bid_id=self.id)
             return url
 
 
@@ -59,4 +59,3 @@ class Auction(BaseAuction):
         return Value(dict(amount=0))
 
 DGFInsider = Auction
-

@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from logging import getLogger
 from pkg_resources import get_distribution
-from openprocurement.api.models import get_now, TZ
+from openprocurement.api.models import get_now
 from openprocurement.api.utils import context_unpack
 from openprocurement.auctions.core.utils import (
-    cleanup_bids_for_cancelled_lots, check_complaint_status,
     remove_draft_bids,
 )
 from openprocurement.auctions.dgf.utils import check_award_status
@@ -18,20 +17,19 @@ PKG = get_distribution(__package__)
 LOGGER = getLogger(PKG.project_name)
 
 
-def generate_participation_url(request, bid_id):
+def generate_auction_url(request, bid_id=None):
     auction_module_url = request.registry.auction_module_url
-    auction_id = request.validated['auction_id']
-    signature = quote(b64encode(request.registry.signer.signature(bid_id)))
-    return '{}/auctions/{}/login?bidder_id={}&signature={}'.format(auction_module_url, auction_id, bid_id, signature)
+    auction_id = request.validated['auction']['id']
+    if bid_id:
+        auction_id = request.validated['auction_id']
+        signature = quote(b64encode(request.registry.signer.signature(bid_id)))
+        return '{}/insider-auctions/{}/login?bidder_id={}&signature={}'.format(auction_module_url, auction_id, bid_id, signature)
+    return '{}/insider-auctions/{}'.format(auction_module_url, auction_id)
 
 
 def check_bids(request):
     auction = request.validated['auction']
     auction.status = 'unsuccessful'
-    # if auction.numberOfBids < 2:
-    #     if auction.auctionPeriod and auction.auctionPeriod.startDate:
-    #         auction.auctionPeriod.startDate = None
-    #     auction.status = 'unsuccessful'
 
 
 def check_auction_status(request):
@@ -59,10 +57,9 @@ def check_status(request):
         LOGGER.info('Switched auction {} to {}'.format(auction['id'], 'active.auction'),
                     extra=context_unpack(request, {'MESSAGE_ID': 'switched_auction_active.auction'}))
         auction.status = 'active.auction'
+        auction.auctionUrl = generate_auction_url(request)
         remove_draft_bids(request)
         check_bids(request)
-        # if auction.numberOfBids < 2 and auction.auctionPeriod:
-        #     auction.auctionPeriod.startDate = None
         return
 
 
