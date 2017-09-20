@@ -108,11 +108,6 @@ class InsiderAuctionAuctionResourceTest(BaseInsiderAuctionWebTest):
             ]
         }
 
-        response = self.app.post_json('/auctions/{}/auction'.format(self.auction_id), {'data': patch_data}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Number of auction results did not match the number of auction bids")
-
         patch_data['bids'].append({
             "value": {
                 "amount": 409,
@@ -127,13 +122,6 @@ class InsiderAuctionAuctionResourceTest(BaseInsiderAuctionWebTest):
         self.assertEqual(response.status, '422 Unprocessable Entity')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['errors'][0]["description"], {u'id': [u'Hash value is wrong length.']})
-
-        patch_data['bids'][1]['id'] = "00000000000000000000000000000000"
-
-        response = self.app.post_json('/auctions/{}/auction'.format(self.auction_id), {'data': patch_data}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Auction bids should be identical to the auction bids")
 
         patch_data['bids'][1]['id'] = self.initial_bids[0]['id']
 
@@ -186,10 +174,6 @@ class InsiderAuctionAuctionResourceTest(BaseInsiderAuctionWebTest):
             ]
         }
 
-        response = self.app.patch_json('/auctions/{}/auction'.format(self.auction_id), {'data': patch_data}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Number of auction results did not match the number of auction bids")
 
         patch_data['bids'].append({
             "participationUrl": u'http://auction-sandbox.openprocurement.org/auctions/{}?key_for_bid={}'.format(self.auction_id, self.initial_bids[0]['id'])
@@ -201,13 +185,6 @@ class InsiderAuctionAuctionResourceTest(BaseInsiderAuctionWebTest):
         self.assertEqual(response.status, '422 Unprocessable Entity')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['errors'][0]["description"], {u'id': [u'Hash value is wrong length.']})
-
-        patch_data['bids'][1]['id'] = "00000000000000000000000000000000"
-
-        response = self.app.patch_json('/auctions/{}/auction'.format(self.auction_id), {'data': patch_data}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Auction bids should be identical to the auction bids")
 
         patch_data['bids'][1]['id'] = self.initial_bids[0]['id']
 
@@ -320,7 +297,7 @@ class InsiderAuctionBidInvalidationAuctionResourceTest(BaseInsiderAuctionWebTest
         self.assertEqual(auction["bids"][2]['status'], 'invalid')
         self.assertEqual('unsuccessful', auction["status"])
 
-    def test_post_auction_one_invalid_bid(self):
+    def test_post_auction_one_bid_without_value(self):
         self.app.authorization = ('Basic', ('auction', ''))
 
         response = self.app.get('/auctions/{}'.format(self.auction_id))

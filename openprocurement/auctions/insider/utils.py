@@ -4,7 +4,6 @@ from pkg_resources import get_distribution
 from openprocurement.api.models import get_now, TZ
 from openprocurement.api.utils import context_unpack
 from openprocurement.auctions.core.utils import (
-    cleanup_bids_for_cancelled_lots, check_complaint_status,
     remove_draft_bids,
 )
 from openprocurement.auctions.dgf.utils import check_award_status
@@ -23,15 +22,6 @@ def generate_participation_url(request, bid_id):
     auction_id = request.validated['auction_id']
     signature = quote(b64encode(request.registry.signer.signature(bid_id)))
     return '{}/auctions/{}/login?bidder_id={}&signature={}'.format(auction_module_url, auction_id, bid_id, signature)
-
-
-def check_bids(request):
-    auction = request.validated['auction']
-    auction.status = 'unsuccessful'
-    # if auction.numberOfBids < 2:
-    #     if auction.auctionPeriod and auction.auctionPeriod.startDate:
-    #         auction.auctionPeriod.startDate = None
-    #     auction.status = 'unsuccessful'
 
 
 def check_auction_status(request):
@@ -55,22 +45,23 @@ def check_status(request):
     now = get_now()
     for award in auction.awards:
         check_award_status(request, award, now)
-    if auction.status == 'active.tendering' and auction.tenderPeriod.endDate <= now:
+    if auction.status == 'active.tendering' and auction.enquiryPeriod.endDate <= now:
         LOGGER.info('Switched auction {} to {}'.format(auction['id'], 'active.auction'),
                     extra=context_unpack(request, {'MESSAGE_ID': 'switched_auction_active.auction'}))
         auction.status = 'active.auction'
         remove_draft_bids(request)
-        check_bids(request)
-        # if auction.numberOfBids < 2 and auction.auctionPeriod:
-        #     auction.auctionPeriod.startDate = None
         return
-
-
-def invalidate_bids_under_threshold(auction):
-    value_threshold = round(auction['value']['amount'] + auction['minimalStep']['amount'], 2)
-    for bid in auction['bids']:
-        if not bid.get('value') or bid['value']['amount'] < value_threshold:
-            bid['status'] = 'invalid'
+    elif auction.status == 'active.awarded':
+        standStillEnds = [
+            a.complaintPeriod.endDate.astimezone(TZ)
+            for a in auction.awards
+            if a.complaintPeriod.endDate
+        ]
+        if not standStillEnds:
+            return
+        standStillEnd = max(standStillEnds)
+        if standStillEnd <= now:
+            check_auction_status(request)
 
 
 def create_awards(request):
@@ -79,7 +70,6 @@ def create_awards(request):
     now = get_now()
     auction.awardPeriod = type(auction).awardPeriod({'startDate': now})
     valid_bids = [bid for bid in auction.bids if bid['status'] != 'invalid']
-
     bids = chef(valid_bids, auction.features or [], [], True)
 
     for bid, status in zip(bids, ['pending.verification', 'pending.waiting']):
@@ -97,3 +87,9 @@ def create_awards(request):
             award.signingPeriod = award.paymentPeriod = award.verificationPeriod = {'startDate': now}
             request.response.headers['Location'] = request.route_url('{}:Auction Awards'.format(auction.procurementMethodType), auction_id=auction.id, award_id=award['id'])
         auction.awards.append(award)
+
+
+def invalidate_empty_bids(auction):
+    for bid in auction['bids']:
+        if not bid.get('value'):
+            bid['status'] = 'invalid'
