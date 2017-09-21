@@ -72,7 +72,7 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
         self.assertIn('auctionPeriod', item)
         self.assertIn('shouldStartAfter', item['auctionPeriod'])
         self.assertGreaterEqual(response.json['data']['tenderPeriod']['endDate'], item['auctionPeriod']['shouldStartAfter'])
-        self.assertIn('T09:00:00+', item['auctionPeriod']['shouldStartAfter'])
+        self.assertIn('T00:00:00+', item['auctionPeriod']['shouldStartAfter'])
         self.assertEqual(response.json['data']['next_check'], response.json['data']['tenderPeriod']['endDate'])
 
         if self.initial_lots:

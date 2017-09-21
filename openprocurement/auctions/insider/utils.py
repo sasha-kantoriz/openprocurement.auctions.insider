@@ -2,7 +2,7 @@
 from logging import getLogger
 from pkg_resources import get_distribution
 from openprocurement.api.models import get_now, TZ
-from openprocurement.api.utils import context_unpack, calculate_business_date
+from openprocurement.api.utils import context_unpack
 from openprocurement.auctions.core.utils import (
     cleanup_bids_for_cancelled_lots, check_complaint_status,
     remove_draft_bids,
@@ -12,12 +12,9 @@ from barbecue import chef
 
 from urllib import quote
 from base64 import b64encode
-from datetime import timedelta
-
 
 PKG = get_distribution(__package__)
 LOGGER = getLogger(PKG.project_name)
-DUTCH_PERIOD = timedelta(0, 18000)
 
 
 def generate_participation_url(request, bid_id):
@@ -55,10 +52,9 @@ def check_auction_status(request):
 def check_status(request):
     auction = request.validated['auction']
     now = get_now()
-    start_after = calculate_business_date(auction.tenderPeriod.endDate, -DUTCH_PERIOD, auction)
     for award in auction.awards:
         check_award_status(request, award, now)
-    if auction.status == 'active.tendering' and start_after <= now:
+    if auction.status == 'active.tendering' and auction.enquiryPeriod.endDate <= now:
         LOGGER.info('Switched auction {} to {}'.format(auction['id'], 'active.auction'),
                     extra=context_unpack(request, {'MESSAGE_ID': 'switched_auction_active.auction'}))
         auction.status = 'active.auction'

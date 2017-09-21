@@ -10,7 +10,7 @@ from openprocurement.api.models import (
     Model, ListType
 )
 from openprocurement.api.utils import calculate_business_date
-from openprocurement.api.models import TZ, get_now, SANDBOX_MODE, Value
+from openprocurement.api.models import TZ, get_now, SANDBOX_MODE, Value, Period
 from openprocurement.auctions.core.models import IAuction
 from openprocurement.auctions.flash.models import calc_auction_end_time
 from openprocurement.auctions.dgf.models import (
@@ -18,25 +18,14 @@ from openprocurement.auctions.dgf.models import (
     get_auction, Bid as BaseBid,
     Organization,
     AuctionAuctionPeriod as BaseAuctionPeriod,
-
+    DGF_PLATFORM_LEGAL_DETAILS,
+    rounding_shouldStartAfter,
 )
 
-from openprocurement.auctions.insider.utils import generate_participation_url, DUTCH_PERIOD
+from openprocurement.auctions.insider.utils import generate_participation_url
 
 
-
-AUCTION_START = timedelta(0, 36000)
-DGF_PLATFORM_LEGAL_DETAILS = {
-    'url': 'http://torgi.fg.gov.ua/prozorrosale',
-    'title': u'Місце та форма прийому заяв на участь в аукціоні та банківські реквізити для зарахування гарантійних внесків',
-    'documentType': 'x_dgfPlatformLegalDetails',
-}
-
-def rounding_shouldStartAfter(start_after, auction, use_from=datetime(2016, 6, 1, tzinfo=TZ)):
-    if (auction.enquiryPeriod and auction.enquiryPeriod.startDate or get_now()) > use_from and not (SANDBOX_MODE and auction.submissionMethodDetails and u'quick' in auction.submissionMethodDetails):
-        start_after = datetime.combine(start_after.date(), time(9, tzinfo=start_after.tzinfo))
-    return start_after
-
+DUTCH_PERIOD = timedelta(hours=5)
 
 class AuctionAuctionPeriod(BaseAuctionPeriod):
     """The auction period."""
@@ -46,12 +35,10 @@ class AuctionAuctionPeriod(BaseAuctionPeriod):
         if self.endDate:
             return
         auction = self.__parent__
-        if auction.lots or auction.status not in ['active.tendering', 'active.auction']:
-            return
         if self.startDate and get_now() > calc_auction_end_time(auction.numberOfBids, self.startDate):
             start_after = calc_auction_end_time(auction.numberOfBids, self.startDate)
-        elif auction.tenderPeriod and auction.tenderPeriod.endDate:
-            start_after = calculate_business_date(auction.tenderPeriod.endDate, -DUTCH_PERIOD, auction)
+        elif auction.enquiryPeriod and auction.enquiryPeriod.endDate:
+            start_after = auction.enquiryPeriod.endDate
         else:
             return
         return rounding_shouldStartAfter(start_after, auction).isoformat()
@@ -105,18 +92,26 @@ class Auction(BaseAuction):
             self.tenderPeriod = type(self).tenderPeriod.model_class()
         now = get_now()
         self.tenderPeriod.startDate = self.enquiryPeriod.startDate = now
-        self.enquiryPeriod.endDate = self.tenderPeriod.endDate = calculate_business_date(self.auctionPeriod.startDate, DUTCH_PERIOD + AUCTION_START, self)
+        pause_between_periods = self.auctionPeriod.startDate - (self.auctionPeriod.startDate.replace(hour=20, minute=0, second=0, microsecond=0) - timedelta(days=1))
+        self.enquiryPeriod.endDate = calculate_business_date(self.auctionPeriod.startDate, -pause_between_periods, self)
+        pause_between_periods = self.auctionPeriod.startDate.replace(hour=16, minute=0, second=0, microsecond=0) - self.enquiryPeriod.endDate
+        self.tenderPeriod.endDate = calculate_business_date(self.enquiryPeriod.endDate, pause_between_periods, self)
         self.auctionPeriod.startDate = None
         self.auctionPeriod.endDate = None
         self.date = now
-        if self.lots:
-            for lot in self.lots:
-                lot.date = now
         self.documents.append(type(self).documents.model_class(DGF_PLATFORM_LEGAL_DETAILS))
 
     @serializable(serialized_name="minimalStep", type=ModelType(Value))
     def auction_minimalStep(self):
         return Value(dict(amount=0))
+
+    # @serializable(serialized_name="tenderPeriod", type=ModelType(Period))
+    # def tender_Period(self):
+    #     if self.tenderPeriod and self.auctionPeriod.startDate:
+    #         pause_between_periods = (self.enquiryPeriod.endDate.replace(hour=10, minute=0, second=0, microsecond=0) + timedelta(days=1) + DUTCH_PERIOD) - self.enquiryPeriod.endDate
+    #         self.tenderPeriod.endDate = calculate_business_date(self.enquiryPeriod.endDate, pause_between_periods, self)
+    #     return self.tenderPeriod
+
 
 DGFInsider = Auction
 
