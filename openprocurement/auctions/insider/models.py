@@ -11,9 +11,9 @@ from openprocurement.api.models import (
 )
 
 from openprocurement.api.utils import calculate_business_date
-from openprocurement.api.models import get_now, Value, Period
+from openprocurement.api.models import get_now, Value, Period, TZ
 from openprocurement.auctions.core.models import IAuction
-from openprocurement.auctions.flash.models import calc_auction_end_time
+from openprocurement.auctions.flash.models import calc_auction_end_time, COMPLAINT_STAND_STILL_TIME
 from openprocurement.auctions.dgf.models import (
     DGFFinancialAssets as BaseAuction,
     get_auction, Bid as BaseBid,
@@ -110,6 +110,60 @@ class Auction(BaseAuction):
     #         pause_between_periods = (self.enquiryPeriod.endDate.replace(hour=10, minute=0, second=0, microsecond=0) + timedelta(days=1) + DUTCH_PERIOD) - self.enquiryPeriod.endDate
     #         self.tenderPeriod.endDate = calculate_business_date(self.enquiryPeriod.endDate, pause_between_periods, self)
     #     return self.tenderPeriod
+
+    @serializable(serialize_when_none=False)
+    def next_check(self):
+        if self.suspended:
+            return None
+        now = get_now()
+        checks = []
+        if self.status == 'active.tendering' and self.enquiryPeriod and self.enquiryPeriod.endDate:
+            checks.append(self.enquiryPeriod.endDate.astimezone(TZ))
+        elif not self.lots and self.status == 'active.auction' and self.auctionPeriod and self.auctionPeriod.startDate and not self.auctionPeriod.endDate:
+            if now < self.auctionPeriod.startDate:
+                checks.append(self.auctionPeriod.startDate.astimezone(TZ))
+            elif now < calc_auction_end_time(self.numberOfBids, self.auctionPeriod.startDate).astimezone(TZ):
+                checks.append(calc_auction_end_time(self.numberOfBids, self.auctionPeriod.startDate).astimezone(TZ))
+        elif not self.lots and self.status == 'active.qualification':
+            for award in self.awards:
+                if award.status == 'pending.verification':
+                    checks.append(award.verificationPeriod.endDate.astimezone(TZ))
+                elif award.status == 'pending.payment':
+                    checks.append(award.paymentPeriod.endDate.astimezone(TZ))
+        elif not self.lots and self.status == 'active.awarded' and not any([
+                i.status in self.block_complaint_status
+                for i in self.complaints
+            ]) and not any([
+                i.status in self.block_complaint_status
+                for a in self.awards
+                for i in a.complaints
+            ]):
+            standStillEnds = [
+                a.complaintPeriod.endDate.astimezone(TZ)
+                for a in self.awards
+                if a.complaintPeriod.endDate
+            ]
+            for award in self.awards:
+                if award.status == 'active':
+                    checks.append(award.signingPeriod.endDate.astimezone(TZ))
+
+            last_award_status = self.awards[-1].status if self.awards else ''
+            if standStillEnds and last_award_status == 'unsuccessful':
+                checks.append(max(standStillEnds))
+        if self.status.startswith('active'):
+            from openprocurement.api.utils import calculate_business_date
+            for complaint in self.complaints:
+                if complaint.status == 'claim' and complaint.dateSubmitted:
+                    checks.append(calculate_business_date(complaint.dateSubmitted, COMPLAINT_STAND_STILL_TIME, self))
+                elif complaint.status == 'answered' and complaint.dateAnswered:
+                    checks.append(calculate_business_date(complaint.dateAnswered, COMPLAINT_STAND_STILL_TIME, self))
+            for award in self.awards:
+                for complaint in award.complaints:
+                    if complaint.status == 'claim' and complaint.dateSubmitted:
+                        checks.append(calculate_business_date(complaint.dateSubmitted, COMPLAINT_STAND_STILL_TIME, self))
+                    elif complaint.status == 'answered' and complaint.dateAnswered:
+                        checks.append(calculate_business_date(complaint.dateAnswered, COMPLAINT_STAND_STILL_TIME, self))
+        return min(checks).isoformat() if checks else None
 
 
 DGFInsider = Auction

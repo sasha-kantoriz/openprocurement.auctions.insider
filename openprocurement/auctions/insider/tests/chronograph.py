@@ -36,7 +36,7 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
         self.assertIn('shouldStartAfter', item['auctionPeriod'])
         self.assertGreaterEqual(response.json['data']['tenderPeriod']['endDate'], item['auctionPeriod']['shouldStartAfter'])
         self.assertIn('T00:00:00+', item['auctionPeriod']['shouldStartAfter'])
-        self.assertEqual(response.json['data']['next_check'], response.json['data']['tenderPeriod']['endDate'])
+        self.assertEqual(response.json['data']['next_check'], response.json['data']['enquiryPeriod']['endDate'])
 
         if self.initial_lots:
             response = self.app.patch_json('/auctions/{}'.format(self.auction_id), {'data': {"lots": [{"auctionPeriod": {"startDate": "9999-01-01T00:00:00+00:00"}}]}})
@@ -69,7 +69,7 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
         self.assertIn('auctionPeriod', item)
         self.assertIn('shouldStartAfter', item['auctionPeriod'])
         self.assertGreaterEqual(response.json['data']['tenderPeriod']['endDate'], item['auctionPeriod']['shouldStartAfter'])
-        self.assertEqual(response.json['data']['next_check'], response.json['data']['tenderPeriod']['endDate'])
+        self.assertEqual(response.json['data']['next_check'], response.json['data']['enquiryPeriod']['endDate'])
 
         if self.initial_lots:
             response = self.app.patch_json('/auctions/{}'.format(self.auction_id), {'data': {"lots": [{"auctionPeriod": {"startDate": "9999-01-01T00:00:00"}}]}})
@@ -86,7 +86,7 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.json['data']["status"], 'active.auction')
         item = response.json['data']["lots"][0] if self.initial_lots else response.json['data']
-        self.assertGreaterEqual(item['auctionPeriod']['shouldStartAfter'], response.json['data']['tenderPeriod']['endDate'])
+        self.assertGreaterEqual(item['auctionPeriod']['shouldStartAfter'], response.json['data']['enquiryPeriod']['endDate'])
         
         if self.initial_lots:
             response = self.app.patch_json('/auctions/{}'.format(self.auction_id), {'data': {"lots": [{"auctionPeriod": {"startDate": "9999-01-01T00:00:00"}}]}})
@@ -96,7 +96,7 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
             item = response.json['data']
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.json['data']["status"], 'active.auction')
-        self.assertGreaterEqual(item['auctionPeriod']['shouldStartAfter'], response.json['data']['tenderPeriod']['endDate'])
+        self.assertGreaterEqual(item['auctionPeriod']['shouldStartAfter'], response.json['data']['enquiryPeriod']['endDate'])
         self.assertIn('9999-01-01T00:00:00', item['auctionPeriod']['startDate'])
         self.assertIn('9999-01-01T00:00:00', response.json['data']['next_check'])
         
@@ -112,7 +112,7 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.json['data']["status"], 'active.auction')
         item = response.json['data']["lots"][0] if self.initial_lots else response.json['data']
-        self.assertGreaterEqual(item['auctionPeriod']['shouldStartAfter'], response.json['data']['tenderPeriod']['endDate'])
+        self.assertGreaterEqual(item['auctionPeriod']['shouldStartAfter'], response.json['data']['enquiryPeriod']['endDate'])
         self.assertGreater(response.json['data']['next_check'], item['auctionPeriod']['startDate'])
         self.assertEqual(response.json['data']['next_check'], self.db.get(self.auction_id)['next_check'])
         
@@ -120,7 +120,7 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
             response = self.app.patch_json('/auctions/{}'.format(self.auction_id), {'data': {"lots": [{"auctionPeriod": {"startDate": response.json['data']['tenderPeriod']['endDate']}}]}})
             item = response.json['data']["lots"][0]
         else:
-            response = self.app.patch_json('/auctions/{}'.format(self.auction_id), {'data': {"auctionPeriod": {"startDate": response.json['data']['tenderPeriod']['endDate']}}})
+            response = self.app.patch_json('/auctions/{}'.format(self.auction_id), {'data': {"auctionPeriod": {"startDate": response.json['data']['enquiryPeriod']['endDate']}}})
             item = response.json['data']
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.json['data']["status"], 'active.auction')
