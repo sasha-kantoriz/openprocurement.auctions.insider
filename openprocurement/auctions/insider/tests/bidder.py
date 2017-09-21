@@ -210,20 +210,13 @@ class InsiderAuctionBidderResourceTest(BaseInsiderAuctionWebTest):
     def test_patch_auction_bidder(self):
         if self.initial_organization == test_financial_organization:
             response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': {'tenderers': [self.initial_organization], "status": "draft", "value": {"amount": 500}, 'qualified': True, 'eligible': True}})
+                self.auction_id), {'data': {'tenderers': [self.initial_organization], "status": "draft", 'qualified': True, 'eligible': True}})
         else:
             response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': {'tenderers': [self.initial_organization], "status": "draft", "value": {"amount": 500}, 'qualified': True}})
+                self.auction_id), {'data': {'tenderers': [self.initial_organization], "status": "draft", 'qualified': True}})
         self.assertEqual(response.status, '201 Created')
         self.assertEqual(response.content_type, 'application/json')
         bidder = response.json['data']
-        response = self.app.patch_json('/auctions/{}/bids/{}'.format(self.auction_id, bidder['id']), {"data": {"value": {"amount": 60}}}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': [u'value of bid should be greater than value of auction'], u'location': u'body', u'name': u'value'}
-        ])
 
         response = self.app.patch_json('/auctions/{}/bids/{}'.format(self.auction_id, bidder['id']), {"data": {'tenderers': [{"name": u"Державне управління управлінням справами"}]}})
         self.assertEqual(response.status, '200 OK')
@@ -339,7 +332,7 @@ class InsiderAuctionBidderResourceTest(BaseInsiderAuctionWebTest):
         bidder = response.json['data']
         signature = bidder['participationUrl']
         before, sep, sig = signature.partition('signature=')
-        sig = b64decode(unquote(sig))
+        sig = b64decode(unquote(str(sig)))
         signer = Signer('fe3b3b5999a08e68dfe62687c2ae147f62712ceace58c1ffca8ea819eabcb5d1'.decode('hex'))
         ver = Verifier(signer.hex_vk())
         verified = ver.verify(sig + str(bidder['id']))

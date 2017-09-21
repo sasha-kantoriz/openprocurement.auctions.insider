@@ -1,7 +1,7 @@
 Overview
 ========
 
-openprocurement.auctions.dutch contains documentaion for Deposit Guarantee Fund auctions.
+openprocurement.auctions.insider contains documentaion concerning the new type of the Deposit Guarantee Fund auctions.
 
 The procedure to be used is **dgfInsider** which states for the insolvent bank property and the creditor claim right.
 
@@ -9,17 +9,18 @@ The procedure to be used is **dgfInsider** which states for the insolvent bank p
 Features
 --------
 
-* Procedure can be switched from *draft* status to *active.tendering*.
-* During *active.tendering* period participants can ask questions, submit proposals, and upload documents.
-* The only date Organizer has to provide is *Tender.auctionPeriod.startDate*, the rest will be calculated automatically.
-* Organizer can't edit procedure's significant properties (*Auction.value*, etc.).
-* There is obligatory participant qualification (*Bid.selfQualified*) via guarantee payment. It has to be paid till 16:00 of the auction day.
-* The only currency (*Value.currency*) for this procedure is hryvnia (UAH).
 * Auction consists of 3 stages: Dutch auction, sealed bid and best bid parts.
-* Auction is passing within a day.
+* The only date Organizer has to provide is a preferable day for the auction, the rest will be calculated automatically. 
+* Organizer can't edit procedure's significant properties (*Auction.value*, etc.).
+* Bidders can enter the auction till the end of the Dutch part (tenderPeriod.endDate =  auctionPeriod.startDate + Dutch part duration).
+* There is obligatory participant qualification (*Bid.selfQualified*) via guarantee payment. It has to be paid till 16:00 of the auction day and submitted by the platform.
+* URL for the bidder's participation in auction is generated and sent to the platform right after the platform has denoted (bid.qualified: true) and changed bidder's status to `active`.
+* Bids with the `value` mentioned will be rejected.
 * *Auction.value* is gradually decreasing per 1% during the Dutch part.
+* Bidder can't delete his bid within the first part of the auction.
+* The maximum number of steps within the Dutch part is 80. 
 * In case of no bid has been made within Dutch auction, the whole procedure will be marked as unsuccessful.
-* Bidders can enter the auction till the end of the Dutch part.
+* The `minimalStep` field is optional (value that will be always automatically set is 0). 
 
 
 Conventions

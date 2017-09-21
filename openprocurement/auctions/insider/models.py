@@ -3,14 +3,15 @@ from datetime import datetime, timedelta, time
 from schematics.types import StringType
 from schematics.types.compound import ModelType
 from schematics.exceptions import ValidationError
-from schematics.transforms import  whitelist
+from schematics.transforms import whitelist
 from schematics.types.serializable import serializable
 from zope.interface import implementer
 from openprocurement.api.models import (
     Model, ListType
 )
+
 from openprocurement.api.utils import calculate_business_date
-from openprocurement.api.models import TZ, get_now, SANDBOX_MODE, Value, Period
+from openprocurement.api.models import get_now, Value, Period
 from openprocurement.auctions.core.models import IAuction
 from openprocurement.auctions.flash.models import calc_auction_end_time
 from openprocurement.auctions.dgf.models import (
@@ -22,7 +23,7 @@ from openprocurement.auctions.dgf.models import (
     rounding_shouldStartAfter,
 )
 
-from openprocurement.auctions.insider.utils import generate_participation_url
+from openprocurement.auctions.insider.utils import generate_auction_url
 
 
 DUTCH_PERIOD = timedelta(hours=5)
@@ -62,8 +63,6 @@ class Bid(BaseBid):
             auction = data['__parent__']
             if not value:
                 return
-            if auction.value.amount > value.amount:
-                raise ValidationError(u"value of bid should be greater than value of auction")
             if auction.get('value').currency != value.currency:
                 raise ValidationError(u"currency of bid should be identical to currency of value of auction")
             if auction.get('value').valueAddedTaxIncluded != value.valueAddedTaxIncluded:
@@ -73,7 +72,7 @@ class Bid(BaseBid):
     def participation_url(self):
         if not self.participationUrl and self.status != "draft":
             request = get_auction(self).__parent__.request
-            url = generate_participation_url(request, self.id)
+            url = generate_auction_url(request, bid_id=self.id)
             return url
 
 
@@ -114,4 +113,3 @@ class Auction(BaseAuction):
 
 
 DGFInsider = Auction
-

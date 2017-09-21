@@ -74,10 +74,10 @@ msgid "Next steps"
 msgstr "Наступні кроки"
 
 msgid ""
-"openprocurement.auctions.dutch contains documentaion for Deposit Guarantee "
+"openprocurement.auctions.insider contains documentaion for Deposit Guarantee "
 "Fund auctions."
 msgstr ""
-"openprocurement.auctions.dutch містить документацію по аукціонах Фонду "
+"openprocurement.auctions.insider містить документацію по аукціонах Фонду "
 "гарантування вкладів."
 
 msgid "Features"
@@ -169,11 +169,34 @@ msgid "In case of no bid has been made within Dutch auction, the whole "
 msgstr "Якщо жоден учкасник не зробить цінової пропозиції під час Голландського аукціону, "
 "процедура вважається неуспішною."
 
-msgid "Bidders can enter the auction till the end of the Dutch part."
+msgid "Bidders can enter the auction till the end of the Dutch part"
+"(tenderPeriod.endDate =  auctionPeriod.startDate + Dutch part duration)."
 msgstr "Учасники можуть долучатися до аукціону аж до завершення Голландського етапу."
+"(tenderPeriod.endDate =  auctionPeriod.startDate + тривалість Голландської частини)."
 
+msgid "URL for the bidder's participation in auction is generated and sent to the "
+"platform right after the platform has denoted (bid.qualified: true) and changed "
+"bidder's status to `active`."
+msgstr "URL-адреса для учасників аукціону генерується і надсилається майданчику "
+"відразу після того, як він позначив (bid.qualified: true) і змінив статус учасника на `active`."
 
+msgid "Bids with the `value` mentioned will be rejected."
+msgstr "Пропозиції з вказаним `value` будуть відхилені."
 
+msgid "Bidder can't delete his bid within the first part of the auction."
+msgstr "Учасник торгів не може відкликати свою ставку в першій частині аукціону."
+
+msgid "The maximum number of steps within the Dutch part is 80."
+msgstr "У голландській частині може бути максимум 80 кроків."
+
+msgid "The `minimalStep` field is optional (value that will be always automatically set is 0)."
+msgstr "Поле `minimalStep` є необов’язковим (значення, яке завжди буде автоматично встановлено, "
+"становить 0)."
+
+msgid "openprocurement.auctions.insider contains documentaion concerning the new type "
+"of the Deposit Guarantee Fund auctions."
+msgstr "openprocurement.auctions.insider містить документацію по новому типу аукціону "
+"Фонду гарантування вкладів"
 
 
 
