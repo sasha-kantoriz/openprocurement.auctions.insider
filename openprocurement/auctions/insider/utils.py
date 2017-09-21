@@ -12,7 +12,6 @@ from barbecue import chef
 from urllib import quote
 from base64 import b64encode
 
-
 PKG = get_distribution(__package__)
 LOGGER = getLogger(PKG.project_name)
 
