@@ -59,7 +59,7 @@ class BaseInsiderAuctionWebTest(BaseFinancialAuctionWebTest):
             data.update({
                 "enquiryPeriod": {
                     "startDate": (now - timedelta(days=20)).isoformat(),
-                    "endDate": (now - timedelta(days=13)).isoformat()
+                    "endDate": (now).isoformat()
                 },
                 "tenderPeriod": {
                     "startDate": (now - timedelta(days=20)).isoformat(),
