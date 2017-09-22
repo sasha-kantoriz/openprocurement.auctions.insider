@@ -55,7 +55,8 @@ class Bid(BaseBid):
 
     class Options:
         roles = {
-            'create': whitelist('tenderers', 'parameters', 'lotValues', 'status', 'qualified', 'eligible'),
+            'create': whitelist('tenderers', 'status', 'qualified', 'eligible'),
+            'edit': whitelist('status', 'tenderers'),
         }
 
     def validate_value(self, data, value):
