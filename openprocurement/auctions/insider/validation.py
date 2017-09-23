@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from openprocurement.api.models import get_now
-from openprocurement.api.validation import validate_data, validate_json_data
-from openprocurement.auctions.dgf.validation import validate_patch_auction_data
+from openprocurement.auctions.core.validation import (
+    validate_patch_auction_data,
+)
 
 def validate_auction_auction_data(request):
     data = validate_patch_auction_data(request)
