@@ -9,9 +9,7 @@ from openprocurement.auctions.dgf.tests.base import (
     BaseFinancialAuctionWebTest,
     test_financial_organization,
     test_financial_auction_data,
-    test_financial_auction_data_with_schema,
     test_financial_bids,
-    schema_properties,
     test_lots,
 )
 
@@ -21,11 +19,10 @@ test_organization = deepcopy(test_financial_organization)
 test_procuringEntity = test_organization.copy()
 
 test_insider_auction_data = deepcopy(test_financial_auction_data)
-test_insider_auction_data_with_schema = deepcopy(test_financial_auction_data_with_schema)
 
-for data in test_insider_auction_data, test_insider_auction_data_with_schema:
-    data["procurementMethodType"] = "dgfInsider"
-    del data['minimalStep']
+
+test_insider_auction_data["procurementMethodType"] = "dgfInsider"
+del test_insider_auction_data['minimalStep']
 
 class BaseInsiderWebTest(BaseWebTest):
 
