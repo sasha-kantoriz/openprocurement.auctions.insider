@@ -15,8 +15,6 @@ requires = [
     'openprocurement.auctions.core',
     'openprocurement.auctions.flash',
     'openprocurement.auctions.dgf',
-    'openprocurement.schemas.dgf',
-    'schematics-flexible'
 ]
 
 docs_requires = requires + [
