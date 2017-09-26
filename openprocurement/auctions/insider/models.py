@@ -11,7 +11,7 @@ from openprocurement.api.models import (
 )
 
 from openprocurement.api.utils import calculate_business_date
-from openprocurement.api.models import get_now, Value, Period, TZ
+from openprocurement.api.models import get_now, Value, Period, TZ, SANDBOX_MODE
 from openprocurement.auctions.core.models import IAuction
 from openprocurement.auctions.flash.models import calc_auction_end_time, COMPLAINT_STAND_STILL_TIME
 from openprocurement.auctions.dgf.models import (
@@ -24,7 +24,7 @@ from openprocurement.auctions.dgf.models import (
 )
 
 from openprocurement.auctions.insider.utils import generate_auction_url
-from openprocurement.auctions.insider.constants import DUTCH_PERIOD
+from openprocurement.auctions.insider.constants import DUTCH_PERIOD, QUICK_DUTCH_PERIOD
 
 
 class AuctionAuctionPeriod(BaseAuctionPeriod):
@@ -95,6 +95,8 @@ class Auction(BaseAuction):
         self.enquiryPeriod.endDate = calculate_business_date(self.auctionPeriod.startDate, -pause_between_periods, self)
         time_before_tendering_end = (self.auctionPeriod.startDate.replace(hour=10, minute=0, second=0, microsecond=0) + DUTCH_PERIOD) - self.auctionPeriod.startDate
         self.tenderPeriod.endDate = calculate_business_date(self.auctionPeriod.startDate, time_before_tendering_end, self)
+        if SANDBOX_MODE:
+            self.tenderPeriod.endDate = self.enquiryPeriod.endDate + QUICK_DUTCH_PERIOD
         self.auctionPeriod.startDate = None
         self.auctionPeriod.endDate = None
         self.date = now
