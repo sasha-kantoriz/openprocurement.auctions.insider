@@ -106,12 +106,16 @@ class Auction(BaseAuction):
     def auction_minimalStep(self):
         return Value(dict(amount=0))
 
-    # @serializable(serialized_name="tenderPeriod", type=ModelType(Period))
-    # def tender_Period(self):
-    #     if self.tenderPeriod and self.auctionPeriod.startDate:
-    #         dutch_part = QUICK_DUTCH_PERIOD if SANDBOX_MODE else DUTCH_PERIOD
-    #         self.tenderPeriod.endDate = calculate_business_date(self.auctionPeriod.startDate, dutch_part, self).astimezone(TZ)
-    #     return self.tenderPeriod
+    @serializable(serialized_name="tenderPeriod", type=ModelType(Period))
+    def tender_Period(self):
+        if self.tenderPeriod and self.auctionPeriod.startDate:
+            end_date = calculate_business_date(self.auctionPeriod.startDate, DUTCH_PERIOD, self)
+            if SANDBOX_MODE:
+                end_date = self.enquiryPeriod.endDate + QUICK_DUTCH_PERIOD
+            if self.auctionPeriod.endDate and self.auctionPeriod.endDate <= self.tenderPeriod.endDate:
+                end_date = self.auctionPeriod.endDate.astimezone(TZ)
+            self.tenderPeriod.endDate = end_date
+        return self.tenderPeriod
 
     @serializable(serialize_when_none=False)
     def next_check(self):

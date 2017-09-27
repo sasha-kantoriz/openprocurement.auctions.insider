@@ -118,14 +118,14 @@ class BaseInsiderAuctionWebTest(BaseFinancialAuctionWebTest):
                 },
                 "tenderPeriod": {
                     "startDate": (now - timedelta(days=20)).isoformat(),
-                    "endDate": (now - timedelta(days=13)).isoformat()
+                    "endDate": (now - timedelta(days=11)).isoformat()
                 },
                 "auctionPeriod": {
-                    "startDate": (now + timedelta(days=10)).isoformat(),
-                    "endDate": (now).isoformat()
+                    "startDate": (now - timedelta(days=12)).isoformat(),
+                    "endDate": (now - timedelta(days=10)).isoformat()
                 },
                 "awardPeriod": {
-                    "startDate": (now + timedelta(days=10)).isoformat(),
+                    "startDate": (now - timedelta(days=10)).isoformat(),
                     "endDate": (now).isoformat()
                 }
             })
