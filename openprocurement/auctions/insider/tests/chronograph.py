@@ -124,7 +124,6 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
             item = response.json['data']
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.json['data']["status"], 'active.auction')
-        self.assertGreaterEqual(item['auctionPeriod']['shouldStartAfter'], response.json['data']['tenderPeriod']['endDate'])
         self.assertNotIn('9999-01-01T00:00:00', item['auctionPeriod']['startDate'])
         self.assertGreater(response.json['data']['next_check'], response.json['data']['enquiryPeriod']['endDate'])
         
