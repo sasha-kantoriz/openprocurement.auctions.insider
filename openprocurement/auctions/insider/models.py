@@ -92,11 +92,11 @@ class Auction(BaseAuction):
         now = get_now()
         self.tenderPeriod.startDate = self.enquiryPeriod.startDate = now
         pause_between_periods = self.auctionPeriod.startDate - (self.auctionPeriod.startDate.replace(hour=20, minute=0, second=0, microsecond=0) - timedelta(days=1))
-        self.enquiryPeriod.endDate = calculate_business_date(self.auctionPeriod.startDate, -pause_between_periods, self)
+        self.enquiryPeriod.endDate = calculate_business_date(self.auctionPeriod.startDate, -pause_between_periods, self).astimezone(TZ)
         time_before_tendering_end = (self.auctionPeriod.startDate.replace(hour=10, minute=0, second=0, microsecond=0) + DUTCH_PERIOD) - self.auctionPeriod.startDate
-        self.tenderPeriod.endDate = calculate_business_date(self.auctionPeriod.startDate, time_before_tendering_end, self)
+        self.tenderPeriod.endDate = calculate_business_date(self.auctionPeriod.startDate, time_before_tendering_end, self).astimezone(TZ)
         if SANDBOX_MODE:
-            self.tenderPeriod.endDate = self.enquiryPeriod.endDate + QUICK_DUTCH_PERIOD
+            self.tenderPeriod.endDate = (self.enquiryPeriod.endDate + QUICK_DUTCH_PERIOD).astimezone(TZ)
         self.auctionPeriod.startDate = None
         self.auctionPeriod.endDate = None
         self.date = now
@@ -109,7 +109,8 @@ class Auction(BaseAuction):
     # @serializable(serialized_name="tenderPeriod", type=ModelType(Period))
     # def tender_Period(self):
     #     if self.tenderPeriod and self.auctionPeriod.startDate:
-    #         self.tenderPeriod.endDate = calculate_business_date(self.auctionPeriod.startDate, DUTCH_PERIOD, self)
+    #         dutch_part = QUICK_DUTCH_PERIOD if SANDBOX_MODE else DUTCH_PERIOD
+    #         self.tenderPeriod.endDate = calculate_business_date(self.auctionPeriod.startDate, dutch_part, self).astimezone(TZ)
     #     return self.tenderPeriod
 
     @serializable(serialize_when_none=False)
