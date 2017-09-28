@@ -15,7 +15,7 @@ from openprocurement.auctions.insider.validation import (
 from openprocurement.auctions.dgf.views.financial.auction import (
     FinancialAuctionAuctionResource,
 )
-from openprocurement.auctions.insider.utils import create_awards, invalidate_empty_bids
+from openprocurement.auctions.insider.utils import create_awards, invalidate_empty_bids, merge_auction_results
 
 
 @opresource(name='dgfInsider:Auction Auction',
@@ -26,6 +26,8 @@ from openprocurement.auctions.insider.utils import create_awards, invalidate_emp
 class InsiderAuctionAuctionResource(FinancialAuctionAuctionResource):
     @json_view(content_type="application/json", permission='auction', validators=(validate_auction_auction_data))
     def collection_post(self):
+        auction = self.context.serialize()
+        merge_auction_results(auction, self.request)
         apply_patch(self.request, save=False, src=self.request.validated['auction_src'])
         auction = self.request.validated['auction']
         invalidate_empty_bids(auction)
