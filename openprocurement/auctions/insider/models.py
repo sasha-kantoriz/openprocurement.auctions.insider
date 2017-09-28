@@ -93,7 +93,7 @@ class Auction(BaseAuction):
         self.tenderPeriod.startDate = self.enquiryPeriod.startDate = now
         pause_between_periods = self.auctionPeriod.startDate - (self.auctionPeriod.startDate.replace(hour=20, minute=0, second=0, microsecond=0) - timedelta(days=1))
         self.enquiryPeriod.endDate = calculate_business_date(self.auctionPeriod.startDate, -pause_between_periods, self).astimezone(TZ)
-        time_before_tendering_end = (self.auctionPeriod.startDate.replace(hour=10, minute=0, second=0, microsecond=0) + DUTCH_PERIOD) - self.enquiryPeriod.endDate
+        time_before_tendering_end = (self.auctionPeriod.startDate.replace(hour=9, minute=30, second=0, microsecond=0) + DUTCH_PERIOD) - self.enquiryPeriod.endDate
         self.tenderPeriod.endDate = calculate_business_date(self.enquiryPeriod.endDate, time_before_tendering_end, self)
         if SANDBOX_MODE and self.submissionMethodDetails and 'quick' in self.submissionMethodDetails:
             self.tenderPeriod.endDate = (self.enquiryPeriod.endDate + QUICK_DUTCH_PERIOD).astimezone(TZ)
