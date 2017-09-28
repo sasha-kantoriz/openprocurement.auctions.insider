@@ -60,7 +60,7 @@ class BaseInsiderAuctionWebTest(BaseFinancialAuctionWebTest):
                 },
                 "tenderPeriod": {
                     "startDate": (now - timedelta(days=20)).isoformat(),
-                    "endDate": (now - timedelta(days=13)).isoformat()
+                    "endDate": (now + timedelta(hours=1)).isoformat()
                 },
                 "auctionPeriod": {
                     "startDate": (now).isoformat()
@@ -85,10 +85,10 @@ class BaseInsiderAuctionWebTest(BaseFinancialAuctionWebTest):
                 },
                 "tenderPeriod": {
                     "startDate": (now - timedelta(days=20)).isoformat(),
-                    "endDate": (now - timedelta(days=13)).isoformat()
+                    "endDate": (now - timedelta(days=1)).isoformat()
                 },
                 "auctionPeriod": {
-                    "startDate": (now - timedelta(days=1)).isoformat(),
+                    "startDate": (now - timedelta(days=2)).isoformat(),
                     "endDate": (now).isoformat()
                 },
                 "awardPeriod": {
@@ -115,14 +115,14 @@ class BaseInsiderAuctionWebTest(BaseFinancialAuctionWebTest):
                 },
                 "tenderPeriod": {
                     "startDate": (now - timedelta(days=20)).isoformat(),
-                    "endDate": (now - timedelta(days=13)).isoformat()
+                    "endDate": (now - timedelta(days=11)).isoformat()
                 },
                 "auctionPeriod": {
-                    "startDate": (now + timedelta(days=10)).isoformat(),
-                    "endDate": (now).isoformat()
+                    "startDate": (now - timedelta(days=12)).isoformat(),
+                    "endDate": (now - timedelta(days=10)).isoformat()
                 },
                 "awardPeriod": {
-                    "startDate": (now + timedelta(days=10)).isoformat(),
+                    "startDate": (now - timedelta(days=10)).isoformat(),
                     "endDate": (now).isoformat()
                 }
             })
