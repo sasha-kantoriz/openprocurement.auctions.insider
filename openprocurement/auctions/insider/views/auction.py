@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
 from openprocurement.api.utils import (
     json_view,
     context_unpack,
@@ -8,6 +7,7 @@ from openprocurement.auctions.core.utils import (
     save_auction,
     apply_patch,
     opresource,
+    remove_draft_bids
 )
 from openprocurement.auctions.insider.validation import (
     validate_auction_auction_data,
@@ -29,6 +29,7 @@ class InsiderAuctionAuctionResource(FinancialAuctionAuctionResource):
         apply_patch(self.request, save=False, src=self.request.validated['auction_src'])
         auction = self.request.validated['auction']
         invalidate_empty_bids(auction)
+        remove_draft_bids(self.request)
         if any([i.status == 'active' for i in auction.bids]):
             create_awards(self.request)
         else:
