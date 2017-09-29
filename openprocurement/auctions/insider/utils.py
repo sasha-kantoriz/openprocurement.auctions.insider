@@ -96,3 +96,12 @@ def invalidate_empty_bids(auction):
     for bid in auction['bids']:
         if not bid.get('value'):
             bid['status'] = 'invalid'
+
+
+def merge_auction_results(auction, request):
+    for auction_bid in request.validated['data']['bids']:
+        for bid in auction['bids']:
+            if bid['id'] == auction_bid['id']:
+                bid.update(auction_bid)
+                break
+    request.validated['data']['bids'] = auction['bids']
