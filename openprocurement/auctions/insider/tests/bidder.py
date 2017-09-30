@@ -322,7 +322,7 @@ class InsiderAuctionBidderResourceTest(BaseInsiderAuctionWebTest):
         self.assertEqual(response.content_type, 'application/json')
         # self.assertEqual(response.json['errors'][0]["description"], "Can't delete bid in current (active.qualification) auction status")
 
-    def test_bid_id_signature_verified(self):
+    def test_bid_id_signature_verified_active_bid(self):
         if self.initial_organization == test_financial_organization:
             response = self.app.post_json('/auctions/{}/bids'.format(
                 self.auction_id), {'data': {'tenderers': [self.initial_organization], 'qualified': True, 'eligible': True}})
@@ -333,6 +333,23 @@ class InsiderAuctionBidderResourceTest(BaseInsiderAuctionWebTest):
         signature = bidder['participationUrl']
         before, sep, sig = signature.partition('signature=')
         sig = b64decode(unquote(str(sig)))
+        signer = Signer('fe3b3b5999a08e68dfe62687c2ae147f62712ceace58c1ffca8ea819eabcb5d1'.decode('hex'))
+        ver = Verifier(signer.hex_vk())
+        verified = ver.verify(sig + str(bidder['id']))
+        self.assertEqual(verified, bidder['id'])
+
+    def test_bid_id_signature_verified_draft_active_bid(self):
+        if self.initial_organization == test_financial_organization:
+            response = self.app.post_json('/auctions/{}/bids'.format(
+                self.auction_id), {'data': {'tenderers': [self.initial_organization], 'qualified': True, 'eligible': True, 'status': "draft"}})
+        else:
+            response = self.app.post_json('/auctions/{}/bids'.format(
+                self.auction_id), {'data': {'tenderers': [self.initial_organization], 'qualified': True}})
+        bidder = response.json['data']
+        response = self.app.patch_json('/auctions/{}/bids/{}'.format(self.auction_id, bidder['id']), {'data': {'status': 'active'}})
+        signature = response.json['data']['participationUrl']
+        before, sep, sig = signature.partition('signature=')
+        sig = b64decode(unquote(sig))
         signer = Signer('fe3b3b5999a08e68dfe62687c2ae147f62712ceace58c1ffca8ea819eabcb5d1'.decode('hex'))
         ver = Verifier(signer.hex_vk())
         verified = ver.verify(sig + str(bidder['id']))

@@ -72,7 +72,7 @@ class Bid(BaseBid):
     def participation_url(self):
         if not self.participationUrl and self.status != "draft":
             request = get_auction(self).__parent__.request
-            url = generate_auction_url(request, bid_id=self.id)
+            url = generate_auction_url(request, bid_id=str(self.id))
             return url
 
 

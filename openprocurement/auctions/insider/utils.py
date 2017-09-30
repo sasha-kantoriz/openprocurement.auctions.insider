@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 from logging import getLogger
 from pkg_resources import get_distribution
-from openprocurement.api.models import get_now
+from openprocurement.api.models import get_now, TZ
 from openprocurement.api.utils import context_unpack
-from openprocurement.auctions.core.utils import (
-    remove_draft_bids,
-)
 from openprocurement.auctions.dgf.utils import check_award_status
 from barbecue import chef
 
@@ -52,7 +49,6 @@ def check_status(request):
                     extra=context_unpack(request, {'MESSAGE_ID': 'switched_auction_active.auction'}))
         auction.status = 'active.auction'
         auction.auctionUrl = generate_auction_url(request)
-        remove_draft_bids(request)
         return
     elif auction.status == 'active.awarded':
         standStillEnds = [
@@ -96,3 +92,12 @@ def invalidate_empty_bids(auction):
     for bid in auction['bids']:
         if not bid.get('value'):
             bid['status'] = 'invalid'
+
+
+def merge_auction_results(auction, request):
+    for auction_bid in request.validated['data']['bids']:
+        for bid in auction['bids']:
+            if bid['id'] == auction_bid['id']:
+                bid.update(auction_bid)
+                break
+    request.validated['data']['bids'] = auction['bids']
