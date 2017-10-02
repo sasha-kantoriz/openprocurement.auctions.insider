@@ -338,42 +338,18 @@ class InsiderAuctionBidInvalidationAuctionResourceTest(BaseInsiderAuctionWebTest
             if status == 'pending.verification':
                 self.assertIn("verificationPeriod", auction["awards"][i])
 
-        def test_post_auction_one_valid_bid(self):
-            self.app.authorization = ('Basic', ('auction', ''))
+    def test_post_auction_zero_bids(self):
+        self.app.authorization = ('Basic', ('auction', ''))
 
-            bids = deepcopy(self.initial_bids)
-            bids[0]['value']['amount'] = bids[0]['value']['amount'] * 2
-            response = self.app.post_json('/auctions/{}/auction'.format(self.auction_id), {'data': {'bids': bids}})
-            self.assertEqual(response.status, '200 OK')
-            self.assertEqual(response.content_type, 'application/json')
-            auction = response.json['data']
+        response = self.app.get('/auctions/{}'.format(self.auction_id))
+        self.assertEqual(response.status, '200 OK')
 
-            self.assertEqual(auction["bids"][0]['value']['amount'], bids[0]['value']['amount'])
-            self.assertEqual(auction["bids"][1]['value']['amount'], bids[1]['value']['amount'])
-            self.assertEqual(auction["bids"][2]['value']['amount'], bids[2]['value']['amount'])
+        response = self.app.post_json('/auctions/{}/auction'.format(self.auction_id),{'data': {'bids': []}})
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.content_type, 'application/json')
+        auction = response.json['data']
 
-            value_threshold = auction['value']['amount'] + auction['minimalStep']['amount']
-
-            self.assertGreater(auction["bids"][0]['value']['amount'], value_threshold)
-            self.assertLess(auction["bids"][1]['value']['amount'], value_threshold)
-            self.assertLess(auction["bids"][2]['value']['amount'], value_threshold)
-
-            self.assertEqual(auction["bids"][0]['status'], 'active')
-            self.assertEqual(auction["bids"][1]['status'], 'invalid')
-            self.assertEqual(auction["bids"][2]['status'], 'invalid')
-
-            self.assertEqual('active.qualification', auction["status"])
-
-            for i, status in enumerate(['pending.verification', 'unsuccessful']):
-                self.assertIn("tenderers", auction["bids"][i])
-                self.assertIn("name", auction["bids"][i]["tenderers"][0])
-                # self.assertIn(auction["awards"][0]["id"], response.headers['Location'])
-                self.assertEqual(auction["awards"][i]['bid_id'], bids[i]['id'])
-                self.assertEqual(auction["awards"][i]['value']['amount'], bids[i]['value']['amount'])
-                self.assertEqual(auction["awards"][i]['suppliers'], bids[i]['tenderers'])
-                self.assertEqual(auction["awards"][i]['status'], status)
-                if status == 'pending.verification':
-                    self.assertIn("verificationPeriod", auction["awards"][i])
+        self.assertEqual('unsuccessful', auction["status"])
 
 
 class InsiderAuctionSameValueAuctionResourceTest(BaseInsiderAuctionWebTest):
@@ -440,6 +416,22 @@ class InsiderAuctionSameValueAuctionResourceTest(BaseInsiderAuctionWebTest):
         self.assertEqual(auction["awards"][0]['suppliers'], self.initial_bids[2]['tenderers'])
 
 
+class InsiderAuctionNoBidsResourceTest(BaseInsiderAuctionWebTest):
+    initial_status = 'active.auction'
+
+    def test_post_auction_zero_bids(self):
+        self.app.authorization = ('Basic', ('auction', ''))
+
+        response = self.app.get('/auctions/{}'.format(self.auction_id))
+        self.assertEqual(response.status, '200 OK')
+
+        response = self.app.post_json('/auctions/{}/auction'.format(self.auction_id),{'data': {'bids': []}})
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.content_type, 'application/json')
+        auction = response.json['data']
+
+        self.assertEqual('unsuccessful', auction["status"])
+        self.assertNotIn('bids', auction)
 
 
 def suite():
