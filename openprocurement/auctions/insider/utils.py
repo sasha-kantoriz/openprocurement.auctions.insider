@@ -95,6 +95,8 @@ def invalidate_empty_bids(auction):
 
 
 def merge_auction_results(auction, request):
+    if 'bids' not in request.validated['data']:
+        return
     for auction_bid in request.validated['data']['bids']:
         for bid in auction['bids']:
             if bid['id'] == auction_bid['id']:
