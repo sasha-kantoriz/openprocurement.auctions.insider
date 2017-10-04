@@ -70,7 +70,7 @@ class Bid(BaseBid):
 
     @serializable(serialized_name="participationUrl", serialize_when_none=False)
     def participation_url(self):
-        if not self.participationUrl and self.status != "draft":
+        if not self.participationUrl and self.status == "active":
             request = get_auction(self).__parent__.request
             url = generate_auction_url(request, bid_id=str(self.id))
             return url
