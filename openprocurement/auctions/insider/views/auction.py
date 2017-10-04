@@ -26,8 +26,8 @@ from openprocurement.auctions.insider.utils import create_awards, invalidate_emp
 class InsiderAuctionAuctionResource(FinancialAuctionAuctionResource):
     @json_view(content_type="application/json", permission='auction', validators=(validate_auction_auction_data))
     def collection_post(self):
-        auction = self.context.serialize()
         remove_draft_bids(self.request)
+        auction = self.context.serialize()
         merge_auction_results(auction, self.request)
         apply_patch(self.request, save=False, src=self.request.validated['auction_src'])
         auction = self.request.validated['auction']

@@ -90,7 +90,7 @@ def create_awards(request):
 
 def invalidate_empty_bids(auction):
     for bid in auction['bids']:
-        if not bid.get('value'):
+        if not bid.get('value') and bid['status'] == "active":
             bid['status'] = 'invalid'
 
 
