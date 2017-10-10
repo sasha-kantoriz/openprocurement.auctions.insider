@@ -43,10 +43,17 @@ class InsiderAuctionAuctionResourceTest(BaseInsiderAuctionWebTest):
         ])
 
     def test_get_auction_auction(self):
-        response = self.app.get('/auctions/{}/auction'.format(self.auction_id), status=403)
-        self.assertEqual(response.status, '403 Forbidden')
+        response = self.app.get('/auctions/{}/auction'.format(self.auction_id))
+        self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Can't get auction info in current (active.tendering) auction status")
+        auction = response.json['data']
+        self.assertNotEqual(auction, self.initial_data)
+        self.assertIn('dateModified', auction)
+        self.assertIn('minimalStep', auction)
+        self.assertNotIn("procuringEntity", auction)
+        self.assertNotIn("tenderers", auction["bids"][0])
+        self.assertNotIn("value", auction["bids"][0])
+        self.assertNotIn("value", auction["bids"][1])
 
         self.set_status('active.auction')
 
