@@ -1,0 +1,32 @@
+PUT /api/2.3/auctions/826ce0aeaf9a408487a657a5820b7c01/documents/fc2bca86b36f4d4694cbee956dd40914?acc_token=d31a937417d947c88d8130d9215c919b HTTP/1.0
+Authorization: Basic YnJva2VyOg==
+Content-Length: 336
+Content-Type: application/json
+Host: api-sandbox.ea.openprocurement.org
+
+{
+  "data": {
+    "url": "http://public.docs-sandbox.ea.openprocurement.org/get/b044980d06a84777900d4416b35fa7a4?KeyID=020ebf5f&Signature=CwVP5CoawGDpBdeT15d2IqjBKBYH0pl02sL5eO72el4euxODVpUzLMkk4MJ6y8U5UL9dlVua6eTwtl%2FTpJN1Aw%3D%3D", 
+    "title": "AwardCriteria-2.pdf", 
+    "hash": "md5:00000000000000000000000000000000", 
+    "format": "application/pdf"
+  }
+}
+
+
+200 OK
+Content-Type: application/json; charset=UTF-8
+
+{
+  "data": {
+    "hash": "md5:00000000000000000000000000000000", 
+    "format": "application/pdf", 
+    "url": "http://public.docs-sandbox.ea.openprocurement.org/get/b044980d06a84777900d4416b35fa7a4?KeyID=020ebf5f&Signature=GMdOIL1tZus5aoXeCnAibhhP%2FPeFT%2F%2FqNW8Ci9K0eRebq4Wtb04VSPm1umu8Psk9zHuLBMdxo2pBXr8UeK%2FUDA%253D%253D", 
+    "title": "AwardCriteria-2.pdf", 
+    "documentOf": "tender", 
+    "datePublished": "2017-10-11T12:57:46.782930+03:00", 
+    "dateModified": "2017-10-11T12:57:46.865994+03:00", 
+    "id": "fc2bca86b36f4d4694cbee956dd40914"
+  }
+}
+

@@ -4,17 +4,28 @@ import json
 import os
 from datetime import timedelta, datetime
 from uuid import uuid4
+from copy import deepcopy
 
 from openprocurement.api.models import get_now
 import openprocurement.auctions.insider.tests.base as base_test
+from openprocurement.auctions.dgf.tests.base import base_test_bids, test_financial_organization
 from openprocurement.auctions.flash.tests.base import PrefixedRequestClass
-from openprocurement.auctions.insider.tests.base import test_auction_data as base_test_auction_data, test_bids, test_financial_bids
-from openprocurement.auctions.insider.tests.tender import BaseAuctionWebTest
+from openprocurement.auctions.insider.tests.base import test_insider_auction_data as base_test_auction_data, BaseInsiderAuctionWebTest, test_procuringEntity
 from webtest import TestApp
 
 now = datetime.now()
 
 test_auction_data = base_test_auction_data.copy()
+
+test_auction_data["procurementMethodType"] = "dgfInsider"
+
+test_bids = []
+for i in base_test_bids:
+    bid = deepcopy(i)
+    bid.update({'eligible': True})
+    bid.update({'qualified': True})
+    bid['tenderers'] = [test_financial_organization]
+    test_bids.append(bid)
 
 bid = {
     "data": {
@@ -42,6 +53,7 @@ bid = {
         ],
         "status": "draft",
         "qualified": True,
+        "eligible": True
     }
 }
 
@@ -70,6 +82,10 @@ bid2 = {
             }
         ],
         "qualified": True,
+        "eligible": True,
+        "value": {
+            "amount": 501
+        }
     }
 }
 
@@ -201,7 +217,7 @@ class DumpsTestAppwebtest(TestApp):
         return resp
 
 
-class AuctionResourceTest(BaseAuctionWebTest):
+class AuctionResourceTest(BaseInsiderAuctionWebTest):
     initial_data = test_auction_data
     initial_bids = test_bids
     docservice = True
@@ -221,7 +237,6 @@ class AuctionResourceTest(BaseAuctionWebTest):
         return super(AuctionResourceTest, self).generate_docservice_url().replace('/localhost/', '/public.docs-sandbox.ea.openprocurement.org/')
 
     def test_docs_acceleration(self):
-        # SANDBOX_MODE=TRUE
         data = test_auction_data.copy()
         data['procurementMethodDetails'] = 'quick, accelerator=1440'
         data['submissionMethodDetails'] = 'quick'
@@ -526,25 +541,11 @@ class AuctionResourceTest(BaseAuctionWebTest):
 
         # Auction
         #
+        self.set_status('active.auction', {'status': 'active.tendering'})
 
-        self.set_status('active.auction')
-        self.app.authorization = ('Basic', ('auction', ''))
-        patch_data = {
-            'auctionUrl': u'http://auction-sandbox.openprocurement.org/auctions/{}'.format(self.auction_id),
-            'bids': [
-                {
-                    "id": bid1_id,
-                    "participationUrl": u'http://auction-sandbox.openprocurement.org/auctions/{}?key_for_bid={}'.format(self.auction_id, bid1_id)
-                },
-                {
-                    "id": bid2_id,
-                    "participationUrl": u'http://auction-sandbox.openprocurement.org/auctions/{}?key_for_bid={}'.format(self.auction_id, bid2_id)
-                }
-            ]
-        }
-        response = self.app.patch_json('/auctions/{}/auction?acc_token={}'.format(self.auction_id, owner_token),
-                                       {'data': patch_data})
-        self.assertEqual(response.status, '200 OK')
+        self.app.authorization = ('Basic', ('chronograph', ''))
+        response = self.app.patch_json('/auctions/{}'.format(self.auction_id), {"data": {"id": self.auction_id}})
+        self.assertIn('auctionUrl', response.json['data'])
 
         self.app.authorization = ('Basic', ('broker', ''))
 
@@ -567,9 +568,8 @@ class AuctionResourceTest(BaseAuctionWebTest):
 
         self.app.authorization = ('Basic', ('auction', ''))
         response = self.app.get('/auctions/{}/auction'.format(self.auction_id))
-        auction_bids_data = response.json['data']['bids']
         response = self.app.post_json('/auctions/{}/auction'.format(self.auction_id),
-                                      {'data': {'bids': auction_bids_data}})
+                                      {'data': {'bids': test_bids}})
 
         self.app.authorization = ('Basic', ('broker', ''))
 
@@ -743,31 +743,20 @@ class AuctionResourceTest(BaseAuctionWebTest):
         self.set_status('active.tendering')
         self.app.authorization = ('Basic', ('broker', ''))
         response = self.app.post_json('/auctions/{}/bids'.format(self.auction_id),
-                                      {'data': {"qualified": True, 'tenderers': [bid["data"]["tenderers"][0]], "value": {"amount": 450}}})
+                                      {'data': {"qualified": True, 'tenderers': [bid["data"]["tenderers"][0]], "eligible": True}})
         self.initial_bids_tokens[response.json['data']['id']] = response.json['access']['token']
         self.app.authorization = ('Basic', ('broker', ''))
         response = self.app.post_json('/auctions/{}/bids'.format(self.auction_id),
-                                      {'data': {"qualified": True, 'tenderers': [bid["data"]["tenderers"][0]], "value": {"amount": 475}}})
+                                      {'data': {"qualified": True, 'tenderers': [bid2["data"]["tenderers"][0]], "value": {"amount": 475}, "eligible": True}})
         self.initial_bids_tokens[response.json['data']['id']] = response.json['access']['token']
         # get auction info
         self.set_status('active.auction')
         self.app.authorization = ('Basic', ('auction', ''))
         response = self.app.get('/auctions/{}/auction'.format(self.auction_id))
         auction_bids_data = response.json['data']['bids']
-        # posting auction urls
-        response = self.app.patch_json('/auctions/{}/auction'.format(self.auction_id),
-                                       {
-                                           'data': {
-                                               'auctionUrl': 'https://auction.auction.url',
-                                               'bids': [
-                                                   {
-                                                       'id': i['id'],
-                                                       'participationUrl': 'https://auction.auction.url/for_bid/{}'.format(i['id'])
-                                                   }
-                                                   for i in auction_bids_data
-                                               ]
-                                           }
-        })
+        auction_bids_data[0]['value'] = {'amount': 500}
+        auction_bids_data[1]['value'] = {'amount': 510}
+
         # posting auction results
         self.app.authorization = ('Basic', ('auction', ''))
         response = self.app.post_json('/auctions/{}/auction'.format(self.auction_id),

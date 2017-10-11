@@ -1,12 +1,12 @@
-PATCH /api/2.3/auctions/826ce0aeaf9a408487a657a5820b7c01/awards/c50fc56b3aa14fcc8dcc95d9498710f5?acc_token=f95bff6de12b4f01a05b7f1de88b4b34 HTTP/1.0
+PATCH /api/2.3/auctions/826ce0aeaf9a408487a657a5820b7c01/bids/8c99919d866948839e883c7d8440ec3e?acc_token=f95bff6de12b4f01a05b7f1de88b4b34 HTTP/1.0
 Authorization: Basic YnJva2VyOg==
-Content-Length: 33
+Content-Length: 30
 Content-Type: application/json
 Host: api-sandbox.ea.openprocurement.org
 
 {
   "data": {
-    "status": "cancelled"
+    "status": "active"
   }
 }
 
@@ -16,12 +16,11 @@ Content-Type: application/json; charset=UTF-8
 
 {
   "data": {
-    "status": "cancelled", 
-    "complaintPeriod": {
-      "startDate": "2017-10-11T12:57:48.582436+03:00", 
-      "endDate": "2017-10-11T12:57:48.821418+03:00"
-    }, 
-    "suppliers": [
+    "status": "active", 
+    "eligible": true, 
+    "date": "2017-10-11T12:57:47.519946+03:00", 
+    "qualified": true, 
+    "tenderers": [
       {
         "contactPoint": {
           "email": "soleksuk@gmail.com", 
@@ -43,14 +42,9 @@ Content-Type: application/json; charset=UTF-8
         }
       }
     ], 
-    "bid_id": "8c99919d866948839e883c7d8440ec3e", 
-    "value": {
-      "currency": "UAH", 
-      "amount": 469.0, 
-      "valueAddedTaxIncluded": true
-    }, 
-    "date": "2017-10-11T12:57:48.831407+03:00", 
-    "id": "c50fc56b3aa14fcc8dcc95d9498710f5"
+    "owner": "broker", 
+    "id": "8c99919d866948839e883c7d8440ec3e", 
+    "participationUrl": "http://auction-sandbox.openprocurement.org/insider-auctions/826ce0aeaf9a408487a657a5820b7c01/login?bidder_id=8c99919d866948839e883c7d8440ec3e&signature=Fus6nfwW8sEQf6qGZbEpT%2BVcmrf0wvhatwoRJI0gLvpfMqCj4AzY364nT7VkgX4lPNdUWv9eKuiL%2Bf4f6qhvBg%3D%3D"
   }
 }
 

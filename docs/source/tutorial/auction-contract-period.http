@@ -1,0 +1,83 @@
+PATCH /api/2.3/auctions/826ce0aeaf9a408487a657a5820b7c01/contracts/dd8330681e1a4f26bed059ab6048b7b6?acc_token=d31a937417d947c88d8130d9215c919b HTTP/1.0
+Authorization: Basic YnJva2VyOg==
+Content-Length: 106
+Content-Type: application/json
+Host: api-sandbox.ea.openprocurement.org
+
+{
+  "data": {
+    "period": {
+      "startDate": "2017-10-11T12:57:40.602343", 
+      "endDate": "2018-10-11T12:57:40.602343"
+    }
+  }
+}
+
+
+200 OK
+Content-Type: application/json; charset=UTF-8
+
+{
+  "data": {
+    "status": "pending", 
+    "items": [
+      {
+        "description": "Земля для військовослужбовців", 
+        "classification": {
+          "scheme": "CAV", 
+          "description": "Земельні ділянки", 
+          "id": "06000000-2"
+        }, 
+        "address": {
+          "postalCode": "79000", 
+          "countryName": "Україна", 
+          "streetAddress": "вул. Банкова 1", 
+          "region": "м. Київ", 
+          "locality": "м. Київ"
+        }, 
+        "id": "3b35dd9f674e44059f1c4fbb8c11a739", 
+        "unit": {
+          "code": "44617100-9", 
+          "name": "item"
+        }, 
+        "quantity": 5
+      }
+    ], 
+    "suppliers": [
+      {
+        "contactPoint": {
+          "email": "aagt@gmail.com", 
+          "telephone": "+380 (322) 91-69-30", 
+          "name": "Андрій Олексюк"
+        }, 
+        "identifier": {
+          "scheme": "UA-EDR", 
+          "id": "00137226", 
+          "uri": "http://www.sc.gov.ua/"
+        }, 
+        "name": "ДКП «Книга»", 
+        "address": {
+          "postalCode": "79013", 
+          "countryName": "Україна", 
+          "streetAddress": "вул. Островського, 34", 
+          "region": "м. Львів", 
+          "locality": "м. Львів"
+        }
+      }
+    ], 
+    "period": {
+      "startDate": "2017-10-11T12:57:40.602343+03:00", 
+      "endDate": "2018-10-11T12:57:40.602343+03:00"
+    }, 
+    "value": {
+      "currency": "UAH", 
+      "amount": 479.0, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "date": "2017-10-11T12:57:49.448419+03:00", 
+    "awardID": "6b48914d9d81462a95aa87dff79198f1", 
+    "id": "dd8330681e1a4f26bed059ab6048b7b6", 
+    "contractID": "UA-EA-2017-10-11-000001-1"
+  }
+}
+
