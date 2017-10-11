@@ -1,0 +1,80 @@
+POST /api/2.3/auctions/826ce0aeaf9a408487a657a5820b7c01/bids HTTP/1.0
+Authorization: Basic YnJva2VyOg==
+Content-Length: 741
+Content-Type: application/json
+Host: api-sandbox.ea.openprocurement.org
+
+{
+  "data": {
+    "qualified": true, 
+    "tenderers": [
+      {
+        "contactPoint": {
+          "telephone": "+380 (322) 91-69-30", 
+          "name": "Андрій Олексюк", 
+          "email": "aagt@gmail.com"
+        }, 
+        "identifier": {
+          "scheme": "UA-EDR", 
+          "id": "00137226", 
+          "uri": "http://www.sc.gov.ua/"
+        }, 
+        "name": "ДКП «Книга»", 
+        "address": {
+          "countryName": "Україна", 
+          "postalCode": "79013", 
+          "region": "м. Львів", 
+          "streetAddress": "вул. Островського, 34", 
+          "locality": "м. Львів"
+        }
+      }
+    ], 
+    "value": {
+      "amount": 501
+    }, 
+    "eligible": true
+  }
+}
+
+
+201 Created
+Content-Type: application/json; charset=UTF-8
+Location: http://api-sandbox.ea.openprocurement.org/api/2.3/auctions/826ce0aeaf9a408487a657a5820b7c01/bids/b20d99f8df054c699969509a1c496299
+
+{
+  "access": {
+    "token": "b466022717a848ca9ba03dacf24508ba"
+  }, 
+  "data": {
+    "status": "active", 
+    "eligible": true, 
+    "date": "2017-10-11T12:57:47.825666+03:00", 
+    "qualified": true, 
+    "tenderers": [
+      {
+        "contactPoint": {
+          "email": "aagt@gmail.com", 
+          "telephone": "+380 (322) 91-69-30", 
+          "name": "Андрій Олексюк"
+        }, 
+        "identifier": {
+          "scheme": "UA-EDR", 
+          "id": "00137226", 
+          "uri": "http://www.sc.gov.ua/"
+        }, 
+        "name": "ДКП «Книга»", 
+        "address": {
+          "postalCode": "79013", 
+          "countryName": "Україна", 
+          "streetAddress": "вул. Островського, 34", 
+          "region": "м. Львів", 
+          "locality": "м. Львів"
+        }
+      }
+    ], 
+    "owner": "broker", 
+    "id": "b20d99f8df054c699969509a1c496299", 
+    "participationUrl": "http://auction-sandbox.openprocurement.org/insider-auctions/826ce0aeaf9a408487a657a5820b7c01/login?bidder_id=b20d99f8df054c699969509a1c496299&signature=FcJ6ClhGncKUMABCA0vop7NK2btUnqU86h5SAyZEzGaa303PZvTGYeuavSmYLB6DuffCiHmKi16yEuIBfOSwBQ%3D%3D"
+  }
+}
+
