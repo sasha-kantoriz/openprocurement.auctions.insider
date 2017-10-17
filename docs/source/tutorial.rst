@@ -58,7 +58,7 @@ Let's see what listing of auctions reveals us:
 .. include:: tutorial/initial-auction-listing.http
    :code:
 
-We do see the auction's internal `id` (that can be used to construct full URL by prepending `https://api-sandbox.ea.openprocurement.org/api/0/auctions/`) and its `dateModified` datestamp.
+We do see the auction's internal `id` and its `dateModified` datestamp.
 
 The previous auction contained only required fields. Let's try creating auction with more data
 (auction has status `created`):
@@ -250,11 +250,6 @@ Qualification
 After the competitive auction two `awards` are created:
  * for the first candidate (a participant that has submitted the highest valid bid at the auction) - initially has a `pending.verification` status and awaits auction protocol to be uploaded by the organizer;
  * for the second candidate (a participant that has submitted the second highest valid bid at the auction).
-
-There are two more scenarios that can happen after the competitive auction:
- * If the two highest bidders have invalid bids (lower than auction starting price + minimal step), the awards will not be created at all, and the qualification procedure will automatically receive the "unsuccessful" status. 
- * If the second highest bidder has a bid that is less than the starting price + minimal step, two awards are created, with one of them receiving a pending.verification status and undergoing the qualification procedure, and the other (with an invalid bid) automatically becoming "unsuccessful".
-
 
 .. include:: tutorial/get-awards.http
   :code:
