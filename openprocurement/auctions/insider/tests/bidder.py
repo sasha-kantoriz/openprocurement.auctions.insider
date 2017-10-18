@@ -335,8 +335,8 @@ class InsiderAuctionBidderResourceTest(BaseInsiderAuctionWebTest):
         sig = b64decode(unquote(str(sig)))
         signer = Signer('fe3b3b5999a08e68dfe62687c2ae147f62712ceace58c1ffca8ea819eabcb5d1'.decode('hex'))
         ver = Verifier(signer.hex_vk())
-        verified = ver.verify(sig + str(bidder['id']))
-        self.assertEqual(verified, bidder['id'])
+        verified = ver.verify(sig + str('{}_{}'.format(self.auction_id, bidder['id'])))
+        self.assertEqual(verified, '{}_{}'.format(self.auction_id, bidder['id']))
 
     def test_bid_id_signature_verified_draft_active_bid(self):
         if self.initial_organization == test_financial_organization:
@@ -352,8 +352,8 @@ class InsiderAuctionBidderResourceTest(BaseInsiderAuctionWebTest):
         sig = b64decode(unquote(sig))
         signer = Signer('fe3b3b5999a08e68dfe62687c2ae147f62712ceace58c1ffca8ea819eabcb5d1'.decode('hex'))
         ver = Verifier(signer.hex_vk())
-        verified = ver.verify(sig + str(bidder['id']))
-        self.assertEqual(verified, bidder['id'])
+        verified = ver.verify(sig + str('{}_{}'.format(self.auction_id, bidder['id'])))
+        self.assertEqual(verified, '{}_{}'.format(self.auction_id, bidder['id']))
 
     def test_delete_auction_bidder(self):
         self.app.authorization = ('Basic', ('broker', ''))
