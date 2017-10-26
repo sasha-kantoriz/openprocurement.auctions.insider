@@ -1,0 +1,97 @@
+GET /api/2.3/auctions/826ce0aeaf9a408487a657a5820b7c01/awards HTTP/1.0
+Authorization: Basic YnJva2VyOg==
+Host: api-sandbox.ea.openprocurement.org
+
+
+200 OK
+Content-Type: application/json; charset=UTF-8
+
+{
+  "data": [
+    {
+      "status": "pending.verification", 
+      "paymentPeriod": {
+        "startDate": "2017-10-11T12:57:48.582436+03:00", 
+        "endDate": "2017-10-11T13:18:00.340769+03:00"
+      }, 
+      "verificationPeriod": {
+        "startDate": "2017-10-11T12:57:48.582436+03:00", 
+        "endDate": "2017-10-11T13:02:01.007436+03:00"
+      }, 
+      "signingPeriod": {
+        "startDate": "2017-10-11T12:57:48.582436+03:00", 
+        "endDate": "2017-10-11T13:18:00.340769+03:00"
+      }, 
+      "suppliers": [
+        {
+          "contactPoint": {
+            "email": "aagt@gmail.com", 
+            "telephone": "+380 (322) 91-69-30", 
+            "name": "Андрій Олексюк"
+          }, 
+          "identifier": {
+            "scheme": "UA-EDR", 
+            "id": "00137226", 
+            "uri": "http://www.sc.gov.ua/"
+          }, 
+          "name": "ДКП «Книга»", 
+          "address": {
+            "postalCode": "79013", 
+            "countryName": "Україна", 
+            "streetAddress": "вул. Островського, 34", 
+            "region": "м. Львів", 
+            "locality": "м. Львів"
+          }
+        }
+      ], 
+      "complaintPeriod": {
+        "startDate": "2017-10-11T12:57:48.582436+03:00"
+      }, 
+      "bid_id": "b20d99f8df054c699969509a1c496299", 
+      "value": {
+        "currency": "UAH", 
+        "amount": 479.0, 
+        "valueAddedTaxIncluded": true
+      }, 
+      "date": "2017-10-11T12:57:48.582436+03:00", 
+      "id": "6b48914d9d81462a95aa87dff79198f1"
+    }, 
+    {
+      "status": "pending.waiting", 
+      "complaintPeriod": {
+        "startDate": "2017-10-11T12:57:48.582436+03:00"
+      }, 
+      "suppliers": [
+        {
+          "contactPoint": {
+            "email": "soleksuk@gmail.com", 
+            "telephone": "+380 (432) 21-69-30", 
+            "name": "Сергій Олексюк"
+          }, 
+          "identifier": {
+            "scheme": "UA-EDR", 
+            "id": "00137256", 
+            "uri": "http://www.sc.gov.ua/"
+          }, 
+          "name": "ДКП «Школяр»", 
+          "address": {
+            "postalCode": "21100", 
+            "countryName": "Україна", 
+            "streetAddress": "вул. Островського, 33", 
+            "region": "м. Вінниця", 
+            "locality": "м. Вінниця"
+          }
+        }
+      ], 
+      "bid_id": "8c99919d866948839e883c7d8440ec3e", 
+      "value": {
+        "currency": "UAH", 
+        "amount": 469.0, 
+        "valueAddedTaxIncluded": true
+      }, 
+      "date": "2017-10-11T12:57:48.582436+03:00", 
+      "id": "c50fc56b3aa14fcc8dcc95d9498710f5"
+    }
+  ]
+}
+

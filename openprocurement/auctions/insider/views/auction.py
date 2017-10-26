@@ -24,14 +24,24 @@ from openprocurement.auctions.insider.utils import create_awards, invalidate_emp
             auctionsprocurementMethodType="dgfInsider",
             description="Insider auction auction data")
 class InsiderAuctionAuctionResource(FinancialAuctionAuctionResource):
+
+    @json_view(permission='auction')
+    def collection_get(self):
+        if self.request.validated['auction_status'] not in ['active.tendering', 'active.auction']:
+            self.request.errors.add('body', 'data', 'Can\'t get auction info in current ({}) auction status'.format(
+                self.request.validated['auction_status']))
+            self.request.errors.status = 403
+            return
+        return {'data': self.request.validated['auction'].serialize("auction_view")}
+
     @json_view(content_type="application/json", permission='auction', validators=(validate_auction_auction_data))
     def collection_post(self):
+        remove_draft_bids(self.request)
         auction = self.context.serialize()
         merge_auction_results(auction, self.request)
         apply_patch(self.request, save=False, src=self.request.validated['auction_src'])
         auction = self.request.validated['auction']
         invalidate_empty_bids(auction)
-        remove_draft_bids(self.request)
         if any([i.status == 'active' for i in auction.bids]):
             create_awards(self.request)
         else:

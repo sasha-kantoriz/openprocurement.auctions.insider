@@ -22,12 +22,11 @@ Contents:
 
    overview
    standard/index
-..   upload
-   award_workflow
    tutorial
    fintutorial
    2pc
    acceleration
+   upload
 
 * :ref:`Authentication <openprocurementapi:authentication>`
 * :ref:`Responses <openprocurementapi:errors>`

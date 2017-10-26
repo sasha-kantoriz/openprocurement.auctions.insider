@@ -1,0 +1,27 @@
+PATCH /api/2.3/auctions/826ce0aeaf9a408487a657a5820b7c01/questions/45618708568b4e449c2b7eea951633bc?acc_token=d31a937417d947c88d8130d9215c919b HTTP/1.0
+Authorization: Basic YnJva2VyOg==
+Content-Length: 162
+Content-Type: application/json
+Host: api-sandbox.ea.openprocurement.org
+
+{
+  "data": {
+    "answer": "Таблицю додано в файлі \"Kalorijnist.xslx\""
+  }
+}
+
+
+200 OK
+Content-Type: application/json; charset=UTF-8
+
+{
+  "data": {
+    "description": "Просимо додати таблицю потрібної калорійності харчування", 
+    "title": "Калорійність", 
+    "date": "2017-10-11T12:57:47.291937+03:00", 
+    "answer": "Таблицю додано в файлі \"Kalorijnist.xslx\"", 
+    "id": "45618708568b4e449c2b7eea951633bc", 
+    "questionOf": "tender"
+  }
+}
+

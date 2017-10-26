@@ -1,0 +1,57 @@
+GET /api/2.3/auctions/826ce0aeaf9a408487a657a5820b7c01/documents HTTP/1.0
+Authorization: Basic YnJva2VyOg==
+Host: api-sandbox.ea.openprocurement.org
+
+
+200 OK
+Content-Type: application/json; charset=UTF-8
+
+{
+  "data": [
+    {
+      "title": "Місце та форма прийому заяв на участь в аукціоні та банківські реквізити для зарахування гарантійних внесків", 
+      "url": "http://torgi.fg.gov.ua/prozorrosale", 
+      "documentOf": "tender", 
+      "datePublished": "2017-10-11T12:57:46.113892+03:00", 
+      "documentType": "x_dgfPlatformLegalDetails", 
+      "dateModified": "2017-10-11T12:57:46.113941+03:00", 
+      "id": "9d326e8e885f4851ac0dcc4fc8fef7df"
+    }, 
+    {
+      "hash": "md5:00000000000000000000000000000000", 
+      "description": "document description", 
+      "format": "application/pdf", 
+      "url": "http://public.docs-sandbox.ea.openprocurement.org/get/d29bb78350f2451c91bc82ad43583048?KeyID=020ebf5f&Signature=gG0IWQYPKLz4EJG%2FIYGtk4%2FGBrJ4KQrUk4Mk0DeYJW8kUaC8e%252BchndxZquncge41JGVolHAvUP6KCbIcfx5uCQ%253D%253D", 
+      "title": "Notice.pdf", 
+      "documentOf": "tender", 
+      "datePublished": "2017-10-11T12:57:46.703340+03:00", 
+      "documentType": "technicalSpecifications", 
+      "dateModified": "2017-10-11T12:57:46.703376+03:00", 
+      "id": "74d013ccd08645e3ae01aec83dc34cbb"
+    }, 
+    {
+      "hash": "md5:00000000000000000000000000000000", 
+      "format": "application/pdf", 
+      "url": "http://public.docs-sandbox.ea.openprocurement.org/get/b044980d06a84777900d4416b35fa7a4?KeyID=020ebf5f&Signature=GMdOIL1tZus5aoXeCnAibhhP%2FPeFT%2F%2FqNW8Ci9K0eRebq4Wtb04VSPm1umu8Psk9zHuLBMdxo2pBXr8UeK%2FUDA%253D%253D", 
+      "title": "AwardCriteria-2.pdf", 
+      "documentOf": "tender", 
+      "datePublished": "2017-10-11T12:57:46.782930+03:00", 
+      "dateModified": "2017-10-11T12:57:46.865994+03:00", 
+      "id": "fc2bca86b36f4d4694cbee956dd40914"
+    }, 
+    {
+      "index": 1, 
+      "hash": "md5:00000000000000000000000000000000", 
+      "description": "First illustration description", 
+      "format": "image/jpeg", 
+      "url": "http://public.docs-sandbox.ea.openprocurement.org/get/731b3ae37c51438c8cda19f7ae262f75?KeyID=020ebf5f&Signature=%252BUc0QLy7bbSmyh7XOs3dmqJX69JS9K80rywnRvgkYOv2EUwkrCMRJIemLjlneJQ4%252BbdPrLOJpF8uG%252BjIqS%2FDBQ%253D%253D", 
+      "title": "first_illustration.jpeg", 
+      "documentOf": "tender", 
+      "datePublished": "2017-10-11T12:57:46.945612+03:00", 
+      "documentType": "illustration", 
+      "dateModified": "2017-10-11T12:57:46.945640+03:00", 
+      "id": "5fce5f4243c244d59febef5e4e1dcf28"
+    }
+  ]
+}
+
