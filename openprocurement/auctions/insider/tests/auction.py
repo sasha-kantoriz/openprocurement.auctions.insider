@@ -359,6 +359,44 @@ class InsiderAuctionBidInvalidationAuctionResourceTest(BaseInsiderAuctionWebTest
         self.assertEqual('unsuccessful', auction["status"])
 
 
+class InsiderAuctionDraftBidAuctionResourceTest(BaseInsiderAuctionWebTest):
+    initial_status = 'active.auction'
+    # initial_data = test_insider_auction_data
+    initial_bids = [
+        {
+            "tenderers": [
+                test_organization
+            ],
+            'qualified': True,
+            "eligible": True,
+            'status' : 'draft'
+        }
+        for i in range(3)
+    ]
+
+    def test_post_auction_all_draft_bids(self):
+        self.app.authorization = ('Basic', ('auction', ''))
+
+        response = self.app.get('/auctions/{}'.format(self.auction_id))
+        self.assertEqual(response.status, '200 OK')
+        auction = response.json['data']
+        value_threshold = auction['value']['amount'] + auction['minimalStep']['amount']
+
+        bids = deepcopy(self.initial_bids)
+        bids[0]['value'] = {'amount': value_threshold * 3}
+        bids[1]['value'] = {'amount': value_threshold * 2}
+
+        response = self.app.post_json('/auctions/{}/auction'.format(self.auction_id), {'data': {'bids': bids}})
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.content_type, 'application/json')
+
+        response = self.app.get('/auctions/{}'.format(self.auction_id))
+        auction = response.json['data']
+
+        self.assertNotIn("bids", auction)
+        self.assertEqual('unsuccessful', auction["status"])
+
+
 class InsiderAuctionSameValueAuctionResourceTest(BaseInsiderAuctionWebTest):
     initial_status = 'active.auction'
     initial_bids = [
