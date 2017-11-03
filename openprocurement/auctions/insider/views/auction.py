@@ -36,10 +36,10 @@ class InsiderAuctionAuctionResource(FinancialAuctionAuctionResource):
 
     @json_view(content_type="application/json", permission='auction', validators=(validate_auction_auction_data))
     def collection_post(self):
-        remove_draft_bids(self.request)
         auction = self.context.serialize()
         merge_auction_results(auction, self.request)
         apply_patch(self.request, save=False, src=self.request.validated['auction_src'])
+        remove_draft_bids(self.request)
         auction = self.request.validated['auction']
         invalidate_empty_bids(auction)
         if any([i.status == 'active' for i in auction.bids]):
