@@ -36,6 +36,8 @@ class AuctionAuctionPeriod(BaseAuctionPeriod):
         if self.endDate:
             return
         auction = self.__parent__
+        if auction.status not in ['active.tendering', 'active.auction']:
+            return
         if self.startDate and get_now() > calc_auction_end_time(NUMBER_OF_STAGES, self.startDate):
             start_after = calc_auction_end_time(NUMBER_OF_STAGES, self.startDate)
         elif auction.enquiryPeriod and auction.enquiryPeriod.endDate:
