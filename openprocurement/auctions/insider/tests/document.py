@@ -4,7 +4,7 @@ import unittest
 from openprocurement.auctions.dgf.models import DGF_PLATFORM_LEGAL_DETAILS_FROM
 from openprocurement.auctions.insider.tests.base import BaseInsiderAuctionWebTest
 from openprocurement.auctions.core.tests.base import snitch
-from .blanks.document import (
+from openprocurement.auctions.insider.tests.blanks.document_blanks import (
     # InsiderAuctionDocumentResourceTest
     not_found,
     create_auction_document,

@@ -9,7 +9,7 @@ from openprocurement.auctions.insider.tests.base import (
     BaseInsiderAuctionWebTest, BaseInsiderWebTest,
 )
 from openprocurement.auctions.core.tests.base import snitch
-from .blanks.tender import (
+from openprocurement.auctions.insider.tests.blanks.tender_blanks import (
     # InsiderAuctionTest
     simple_add_auction,
     create_role,

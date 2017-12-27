@@ -8,7 +8,7 @@ from openprocurement.auctions.insider.tests.base import (
     test_insider_auction_data, test_financial_organization,
 )
 from openprocurement.auctions.core.tests.base import snitch
-from .blanks.award import (
+from openprocurement.auctions.insider.tests.blanks.award_blanks import (
     # InsiderAuctionCreateAwardTest
     create_auction_award_invalid,
     create_auction_award,

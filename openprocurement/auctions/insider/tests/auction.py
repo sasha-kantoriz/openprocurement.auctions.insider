@@ -6,7 +6,7 @@ from openprocurement.auctions.insider.tests.base import (
     test_insider_auction_data, test_financial_bids, test_financial_organization, test_insider_auction_data
 )
 from openprocurement.auctions.core.tests.base import snitch
-from .blanks.auction import (
+from openprocurement.auctions.insider.tests.blanks.auction_blanks import (
     # InsiderAuctionAuctionResourceTest
     get_auction_auction_not_found,
     get_auction_auction,

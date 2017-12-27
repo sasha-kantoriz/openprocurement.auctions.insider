@@ -6,7 +6,7 @@ from openprocurement.auctions.insider.tests.base import (
     test_insider_auction_data, test_financial_organization,
 )
 from openprocurement.auctions.core.tests.base import snitch
-from .blanks.cancellation import (
+from openprocurement.auctions.insider.tests.blanks.cancellation_blanks import (
     # InsiderAuctionCancellationResourceTest
     create_auction_cancellation_invalid,
     create_auction_cancellation,

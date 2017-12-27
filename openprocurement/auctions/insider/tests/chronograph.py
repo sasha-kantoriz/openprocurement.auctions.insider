@@ -7,7 +7,7 @@ from openprocurement.auctions.insider.tests.base import (
     BaseInsiderAuctionWebTest, test_financial_bids,
 )
 from openprocurement.auctions.core.tests.base import snitch
-from .blanks.chronograph import (
+from openprocurement.auctions.insider.tests.blanks.chronograph_blanks import (
     # InsiderAuctionSwitchAuctionResourceTest
     switch_to_auction,
     # InsiderAuctionAuctionPeriodResourceTest
