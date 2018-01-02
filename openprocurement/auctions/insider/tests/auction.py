@@ -1,18 +1,23 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from openprocurement.auctions.insider.tests.base import (
-    BaseInsiderAuctionWebTest, test_financial_bids, test_lots, test_organization,
-    test_insider_auction_data, test_financial_bids, test_financial_organization, test_insider_auction_data
-)
 from openprocurement.auctions.core.tests.base import snitch
+from openprocurement.auctions.core.tests.blanks.auction_blanks import (
+    get_auction_auction_not_found,
+    post_auction_auction_document
+)
+from openprocurement.auctions.insider.tests.base import (
+    BaseInsiderAuctionWebTest,
+    test_organization,
+    test_financial_bids,
+    test_financial_organization,
+    test_insider_auction_data
+)
 from openprocurement.auctions.insider.tests.blanks.auction_blanks import (
     # InsiderAuctionAuctionResourceTest
-    get_auction_auction_not_found,
     get_auction_auction,
     post_auction_auction,
     patch_auction_auction,
-    post_auction_auction_document,
     # InsiderAuctionBidInvalidationAuctionResourceTest
     post_auction_all_invalid_bids,
     post_auction_one_bid_without_value,
