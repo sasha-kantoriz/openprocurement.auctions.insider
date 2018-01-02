@@ -6,33 +6,17 @@ from openprocurement.auctions.insider.tests.base import (
     test_insider_auction_data, test_financial_organization,
 )
 from openprocurement.auctions.core.tests.base import snitch
-from openprocurement.auctions.insider.tests.blanks.complaint_blanks import (
-    # InsiderAuctionComplaintResourceTest
-    create_auction_complaint_invalid,
-    create_auction_complaint,
-    patch_auction_complaint,
-    review_auction_complaint,
-    get_auction_complaint,
-    get_auction_complaints,
-    # InsiderAuctionComplaintDocumentResourceTest
-    not_found,
-    create_auction_complaint_document,
-    put_auction_complaint_document,
-    patch_auction_complaint_document
+from openprocurement.auctions.core.tests.complaint import (
+    AuctionComplaintResourceTestMixin,
+    InsiderAuctionComplaintDocumentResourceTestMixin
 )
 
 
-class InsiderAuctionComplaintResourceTest(BaseInsiderAuctionWebTest):
-
-    test_create_auction_complaint_invalid = snitch(create_auction_complaint_invalid)
-    test_create_auction_complaint = snitch(create_auction_complaint)
-    test_patch_auction_complaint = snitch(patch_auction_complaint)
-    test_review_auction_complaint = snitch(review_auction_complaint)
-    test_get_auction_complaint = snitch(get_auction_complaint)
-    test_get_auction_complaints = snitch(get_auction_complaints)
+class InsiderAuctionComplaintResourceTest(BaseInsiderAuctionWebTest, AuctionComplaintResourceTestMixin):
+    """Test Case for Auction Complaint resource"""
 
 
-class InsiderAuctionComplaintDocumentResourceTest(BaseInsiderAuctionWebTest):
+class InsiderAuctionComplaintDocumentResourceTest(BaseInsiderAuctionWebTest, InsiderAuctionComplaintDocumentResourceTestMixin):
 
     def setUp(self):
         super(InsiderAuctionComplaintDocumentResourceTest, self).setUp()
@@ -42,11 +26,6 @@ class InsiderAuctionComplaintDocumentResourceTest(BaseInsiderAuctionWebTest):
         complaint = response.json['data']
         self.complaint_id = complaint['id']
         self.complaint_owner_token = response.json['access']['token']
-
-    test_not_found = snitch(not_found)
-    test_create_auction_complaint_document = snitch(create_auction_complaint_document)
-    test_put_auction_complaint_document = snitch(put_auction_complaint_document)
-    test_patch_auction_complaint_document = snitch(patch_auction_complaint_document)
 
 
 def suite():
