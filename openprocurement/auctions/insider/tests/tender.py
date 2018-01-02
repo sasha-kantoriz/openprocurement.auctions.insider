@@ -1,38 +1,36 @@
 # -*- coding: utf-8 -*-
 import unittest
 
+from openprocurement.auctions.core.tests.base import snitch
+from openprocurement.auctions.core.tests.tender import (
+    AuctionResourceTestMixin, DgfInsiderResourceTestMixin
+)
+from openprocurement.auctions.core.tests.blanks.tender_blanks import (
+    # AuctionTest
+    simple_add_auction,
+    # AuctionProcessTest
+    one_valid_bid_auction,
+    one_invalid_bid_auction,
+)
+
 from openprocurement.auctions.dgf.constants import ELIGIBILITY_CRITERIA
+
 from openprocurement.auctions.insider.models import DGFInsider
 from openprocurement.auctions.insider.tests.base import (
-    test_insider_auction_data, test_insider_auction_data,
+    test_insider_auction_data,
     test_organization, test_financial_organization,
     BaseInsiderAuctionWebTest, BaseInsiderWebTest,
 )
-from openprocurement.auctions.core.tests.base import snitch
 from openprocurement.auctions.insider.tests.blanks.tender_blanks import (
     # InsiderAuctionTest
-    simple_add_auction,
     create_role,
     edit_role,
     # InsiderAuctionResourceTest
-    empty_listing,
-    listing,
-    listing_changes,
-    listing_draft,
     create_auction_invalid,
     create_auction_auctionPeriod,
     create_auction_generated,
-    create_auction_draft,
     create_auction,
-    get_auction,
-    patch_auction,
-    dateModified_auction,
-    auction_not_found,
-    guarantee,
-    auction_Administrator_change,
     # InsiderAuctionProcessTest
-    one_valid_bid_auction,
-    one_invalid_bid_auction,
     first_bid_auction,
     auctionUrl_in_active_auction,
     suspended_auction
@@ -48,27 +46,17 @@ class InsiderAuctionTest(BaseInsiderWebTest):
     test_edit_role = snitch(edit_role)
 
 
-class InsiderAuctionResourceTest(BaseInsiderWebTest):
+class InsiderAuctionResourceTest(BaseInsiderWebTest, AuctionResourceTestMixin, DgfInsiderResourceTestMixin):
+    initial_status = 'active.tendering'
     initial_data = test_insider_auction_data
     initial_organization = test_organization
     eligibility_criteria = ELIGIBILITY_CRITERIA
     test_financial_organization = test_financial_organization
 
-    test_empty_listing = snitch(empty_listing)
-    test_listing = snitch(listing)
-    test_listing_changes = snitch(listing_changes)
-    test_listing_draft = snitch(listing_draft)
     test_create_auction_invalid = snitch(create_auction_invalid)
     test_create_auction_auctionPeriod = snitch(create_auction_auctionPeriod)
     test_create_auction_generated = snitch(create_auction_generated)
-    test_create_auction_draft = snitch(create_auction_draft)
     test_create_auction = snitch(create_auction)
-    test_get_auction = snitch(get_auction)
-    test_patch_auction = snitch(patch_auction)
-    test_dateModified_auction = snitch(dateModified_auction)
-    test_auction_not_found = snitch(auction_not_found)
-    test_guarantee = snitch(guarantee)
-    test_auction_Administrator_change = snitch(auction_Administrator_change)
 
 
 class InsiderAuctionProcessTest(BaseInsiderAuctionWebTest):
