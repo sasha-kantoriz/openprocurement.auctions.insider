@@ -13,6 +13,7 @@ from openprocurement.auctions.insider.tests.base import (
     test_insider_auction_data, test_insider_auction_data,
     test_organization, test_financial_organization,
     BaseInsiderAuctionWebTest, BaseInsiderWebTest,
+    test_insider_auction_data_with_schema, test_insider_auction_data_with_schema,
 )
 
 
@@ -49,7 +50,7 @@ class InsiderAuctionTest(BaseInsiderWebTest):
             'procurementMethodType', 'procuringEntity',
             'submissionMethodDetails', 'submissionMethodDetails_en', 'submissionMethodDetails_ru',
             'title', 'title_en', 'title_ru', 'value', 'auctionPeriod',
-            'dgfDecisionDate', 'dgfDecisionID',
+            'dgfDecisionDate', 'dgfDecisionID', 'merchandisingObject'
         ])
         if SANDBOX_MODE:
             fields.add('procurementMethodDetails')
@@ -1489,11 +1490,42 @@ class InsiderAuctionProcessTest(BaseInsiderAuctionWebTest):
         self.assertEqual(response.json['data']['status'], 'complete')
 
 
+class InsiderAuctionSchemaResourceTest(InsiderAuctionResourceTest):
+    initial_data = test_insider_auction_data_with_schema
+
+    def test_create_auction_with_bad_schemas_code(self):
+        response = self.app.get('/auctions')
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(len(response.json['data']), 0)
+        bad_initial_data = deepcopy(self.initial_data)
+        bad_initial_data['items'][0]['classification']['id'] = "42124210-6"
+        response = self.app.post_json('/auctions', {"data": bad_initial_data},
+                                      status=422)
+        self.assertEqual(response.status, '422 Unprocessable Entity')
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.json['errors'],
+                         [{
+                             "location": "body",
+                             "name": "items",
+                             "description": [{
+                                 "schema_properties": ["classification id mismatch with schema_properties code"]
+                             }]
+                         }])
+
+
+
+class InsiderAuctionSchemaProcessTest(InsiderAuctionProcessTest):
+    initial_data = test_insider_auction_data_with_schema
+
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(InsiderAuctionProcessTest))
     suite.addTest(unittest.makeSuite(InsiderAuctionResourceTest))
     suite.addTest(unittest.makeSuite(InsiderAuctionTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionSchemaResourceTest))
+    suite.addTest(unittest.makeSuite(InsiderAuctionSchemaProcessTest))
+
     return suite
 
 
