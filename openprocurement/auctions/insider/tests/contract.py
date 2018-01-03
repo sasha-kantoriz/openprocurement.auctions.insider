@@ -8,23 +8,17 @@ from openprocurement.auctions.insider.tests.base import (
     test_insider_auction_data, test_financial_organization,
 )
 from openprocurement.auctions.core.tests.base import snitch
-from openprocurement.auctions.insider.tests.blanks.contract_blanks import (
-    # InsiderAuctionContractResourceTest
-    create_auction_contract_invalid,
-    create_auction_contract,
-    create_auction_contract_in_complete_status,
+from openprocurement.auctions.core.tests.contract import (
+    AuctionContractResourceTestMixin,
+    AuctionContractDocumentResourceTestMixin
+)
+from openprocurement.auctions.core.tests.blanks.contract_blanks import (
+    # AuctionContractResourceTest
     patch_auction_contract,
-    get_auction_contract,
-    get_auction_contracts,
-    # InsiderAuctionContractDocumentResourceTest
-    not_found,
-    create_auction_contract_document,
-    put_auction_contract_document,
-    patch_auction_contract_document
 )
 
 
-class InsiderAuctionContractResourceTest(BaseInsiderAuctionWebTest):
+class InsiderAuctionContractResourceTest(BaseInsiderAuctionWebTest, AuctionContractResourceTestMixin):
     initial_status = 'active.auction'
     initial_bids = test_financial_bids
 
@@ -81,15 +75,10 @@ class InsiderAuctionContractResourceTest(BaseInsiderAuctionWebTest):
         self.app.patch_json('/auctions/{}/awards/{}'.format(self.auction_id, self.award_id), {"data": {"status": "pending.payment"}})
         self.app.patch_json('/auctions/{}/awards/{}'.format(self.auction_id, self.award_id), {"data": {"status": "active"}})
 
-    test_create_auction_contract_invalid = snitch(create_auction_contract_invalid)
-    test_create_auction_contract = snitch(create_auction_contract)
-    test_create_auction_contract_in_complete_status = snitch(create_auction_contract_in_complete_status)
     test_patch_auction_contract = snitch(patch_auction_contract)
-    test_get_auction_contract = snitch(get_auction_contract)
-    test_get_auction_contracts = snitch(get_auction_contracts)
 
 
-class InsiderAuctionContractDocumentResourceTest(BaseInsiderAuctionWebTest):
+class InsiderAuctionContractDocumentResourceTest(BaseInsiderAuctionWebTest, AuctionContractDocumentResourceTestMixin):
     #initial_data = auction_data
     initial_status = 'active.auction'
     initial_bids = test_financial_bids
@@ -150,11 +139,6 @@ class InsiderAuctionContractDocumentResourceTest(BaseInsiderAuctionWebTest):
         response = self.app.post_json('/auctions/{}/contracts'.format(self.auction_id), {'data': {'title': 'contract title', 'description': 'contract description', 'awardID': self.award_id}})
         contract = response.json['data']
         self.contract_id = contract['id']
-
-    test_not_found = snitch(not_found)
-    test_create_auction_contract_document = snitch(create_auction_contract_document)
-    test_put_auction_contract_document = snitch(put_auction_contract_document)
-    test_patch_auction_contract_document = snitch(patch_auction_contract_document)
 
 
 def suite():
