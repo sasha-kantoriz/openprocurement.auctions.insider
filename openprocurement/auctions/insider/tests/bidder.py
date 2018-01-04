@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 import unittest
-
+from openprocurement.auctions.core.tests.bidder import (
+    AuctionBidderDocumentResourceTestMixin,
+    AuctionBidderDocumentWithDSResourceTestMixin
+)
+from openprocurement.auctions.core.tests.blanks.bidder_blanks import create_auction_bidder
+from openprocurement.auctions.core.tests.base import snitch
 from openprocurement.auctions.insider.tests.base import (
     BaseInsiderAuctionWebTest, test_financial_bids,
     test_insider_auction_data, test_financial_organization,
 )
-from openprocurement.auctions.core.tests.base import snitch
 from openprocurement.auctions.insider.tests.blanks.bidder_blanks import (
     # InsiderAuctionBidderResourceTest
     create_auction_bidder_invalid,
-    create_auction_bidder,
     create_auction_bidder_without_value,
     patch_auction_bidder,
     get_auction_bidder,
@@ -19,14 +22,7 @@ from openprocurement.auctions.insider.tests.blanks.bidder_blanks import (
     get_auction_auctioners,
     bid_Administrator_change,
     # InsiderAuctionBidderDocumentResourceTest
-    not_found,
-    create_auction_bidder_document,
-    put_auction_bidder_document,
-    patch_auction_bidder_document,
     create_auction_bidder_document_nopending,
-    # InsiderAuctionBidderDocumentWithDSResourceTest
-    create_auction_bidder_document_json,
-    put_auction_bidder_document_json
 )
 
 
@@ -46,7 +42,8 @@ class InsiderAuctionBidderResourceTest(BaseInsiderAuctionWebTest):
     test_bid_Administrator_change = snitch(bid_Administrator_change)
 
 
-class InsiderAuctionBidderDocumentResourceTest(BaseInsiderAuctionWebTest):
+class InsiderAuctionBidderDocumentResourceTest(BaseInsiderAuctionWebTest,
+                                               AuctionBidderDocumentResourceTestMixin):
     initial_status = 'active.tendering'
 
     def setUp(self):
@@ -58,18 +55,14 @@ class InsiderAuctionBidderDocumentResourceTest(BaseInsiderAuctionWebTest):
         self.bid_id = bid['id']
         self.bid_token = response.json['access']['token']
 
-    test_not_found = snitch(not_found)
-    test_create_auction_bidder_document = snitch(create_auction_bidder_document)
-    test_put_auction_bidder_document = snitch(put_auction_bidder_document)
-    test_patch_auction_bidder_document = snitch(patch_auction_bidder_document)
     test_create_auction_bidder_document_nopending = snitch(create_auction_bidder_document_nopending)
 
 
-class InsiderAuctionBidderDocumentWithDSResourceTest(InsiderAuctionBidderDocumentResourceTest):
+class InsiderAuctionBidderDocumentWithDSResourceTest(InsiderAuctionBidderDocumentResourceTest,
+                                                     AuctionBidderDocumentResourceTestMixin,
+                                                     AuctionBidderDocumentWithDSResourceTestMixin
+                                                     ):
     docservice = True
-
-    test_create_auction_bidder_document_json = snitch(create_auction_bidder_document_json)
-    test_put_auction_bidder_document_json = snitch(put_auction_bidder_document_json)
 
 
 def suite():
