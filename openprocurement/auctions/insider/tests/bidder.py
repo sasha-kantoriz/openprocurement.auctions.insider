@@ -4,6 +4,7 @@ from openprocurement.auctions.core.tests.bidder import (
     AuctionBidderDocumentResourceTestMixin,
     AuctionBidderDocumentWithDSResourceTestMixin
 )
+from openprocurement.auctions.core.tests.blanks.bidder_blanks import create_auction_bidder
 from openprocurement.auctions.core.tests.base import snitch
 from openprocurement.auctions.insider.tests.base import (
     BaseInsiderAuctionWebTest, test_financial_bids,
@@ -12,7 +13,6 @@ from openprocurement.auctions.insider.tests.base import (
 from openprocurement.auctions.insider.tests.blanks.bidder_blanks import (
     # InsiderAuctionBidderResourceTest
     create_auction_bidder_invalid,
-    create_auction_bidder,
     create_auction_bidder_without_value,
     patch_auction_bidder,
     get_auction_bidder,

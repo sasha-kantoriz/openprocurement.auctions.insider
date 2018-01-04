@@ -181,44 +181,6 @@ def create_auction_bidder_invalid(self):
                   response.json['errors'])
 
 
-def create_auction_bidder(self):
-    dateModified = self.db.get(self.auction_id).get('dateModified')
-
-    if self.initial_organization == self.test_financial_organization:
-        response = self.app.post_json('/auctions/{}/bids'.format(
-            self.auction_id), {
-            'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True,
-                     'eligible': True}})
-    else:
-        response = self.app.post_json('/auctions/{}/bids'.format(
-            self.auction_id),
-            {'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True}})
-    self.assertEqual(response.status, '201 Created')
-    self.assertEqual(response.content_type, 'application/json')
-    bidder = response.json['data']
-    self.assertEqual(bidder['tenderers'][0]['name'], self.initial_organization['name'])
-    self.assertIn('id', bidder)
-    self.assertIn(bidder['id'], response.headers['Location'])
-
-    self.assertEqual(self.db.get(self.auction_id).get('dateModified'), dateModified)
-
-    self.set_status('complete')
-
-    if self.initial_organization == self.test_financial_organization:
-        response = self.app.post_json('/auctions/{}/bids'.format(
-            self.auction_id), {
-            'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True,
-                     'eligible': True}}, status=403)
-    else:
-        response = self.app.post_json('/auctions/{}/bids'.format(
-            self.auction_id),
-            {'data': {'tenderers': [self.initial_organization], "value": {"amount": 500}, 'qualified': True}},
-            status=403)
-    self.assertEqual(response.status, '403 Forbidden')
-    self.assertEqual(response.content_type, 'application/json')
-    self.assertEqual(response.json['errors'][0]["description"], "Can't add bid in current (complete) auction status")
-
-
 def create_auction_bidder_without_value(self):
     dateModified = self.db.get(self.auction_id).get('dateModified')
 
