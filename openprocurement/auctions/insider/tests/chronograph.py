@@ -7,26 +7,24 @@ from openprocurement.auctions.insider.tests.base import (
     BaseInsiderAuctionWebTest, test_financial_bids,
 )
 from openprocurement.auctions.core.tests.base import snitch
-from openprocurement.auctions.insider.tests.blanks.chronograph_blanks import (
+from openprocurement.auctions.core.tests.blanks.chronograph_blanks import (
     # InsiderAuctionSwitchAuctionResourceTest
     switch_to_auction,
+    # InsiderAuctionDontSwitchSuspendedAuction2ResourceTest
+    switch_suspended_auction_to_auction,
+)
+from openprocurement.auctions.core.tests.chronograph import (
+    AuctionAwardSwitchResourceTestMixin,
+    AuctionDontSwitchSuspendedAuctionResourceTestMixin
+)
+from openprocurement.auctions.insider.tests.blanks.chronograph_blanks import (
     # InsiderAuctionAuctionPeriodResourceTest
     set_auction_period,
     reset_auction_period,
-    # InsiderAuctionAwardSwitchResourceTest
-    switch_verification_to_unsuccessful,
-    switch_payment_to_unsuccessful,
-    switch_active_to_unsuccessful,
     # InsiderAuctionAwardSwitch2ResourceTest
     switch_verification_to_unsuccessful2,
     switch_payment_to_unsuccessful2,
     switch_active_to_unsuccessful2,
-    # InsiderAuctionDontSwitchSuspendedAuction2ResourceTest
-    switch_suspended_auction_to_auction,
-    # InsiderAuctionDontSwitchSuspendedAuctionResourceTest
-    switch_suspended_verification_to_unsuccessful,
-    switch_suspended_payment_to_unsuccessful,
-    switch_suspended_active_to_unsuccessful
 )
 
 
@@ -43,7 +41,7 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
     test_reset_auction_period = snitch(reset_auction_period)
 
 
-class InsiderAuctionAwardSwitchResourceTest(BaseInsiderAuctionWebTest):
+class InsiderAuctionAwardSwitchResourceTest(BaseInsiderAuctionWebTest, AuctionAwardSwitchResourceTestMixin):
     initial_status = 'active.auction'
     initial_bids = test_financial_bids
 
@@ -80,10 +78,6 @@ class InsiderAuctionAwardSwitchResourceTest(BaseInsiderAuctionWebTest):
         self.award_id = self.first_award_id = self.first_award['id']
         self.second_award_id = self.second_award['id']
         self.app.authorization = authorization
-
-    test_switch_verification_to_unsuccessful = snitch(switch_verification_to_unsuccessful)
-    test_switch_payment_to_unsuccessful = snitch(switch_payment_to_unsuccessful)
-    test_switch_active_to_unsuccessful = snitch(switch_active_to_unsuccessful)
 
 
 class InsiderAuctionAwardSwitch2ResourceTest(BaseInsiderAuctionWebTest):
@@ -136,7 +130,7 @@ class InsiderAuctionDontSwitchSuspendedAuction2ResourceTest(BaseInsiderAuctionWe
     test_switch_suspended_auction_to_auction = snitch(switch_suspended_auction_to_auction)
 
 
-class InsiderAuctionDontSwitchSuspendedAuctionResourceTest(BaseInsiderAuctionWebTest):
+class InsiderAuctionDontSwitchSuspendedAuctionResourceTest(BaseInsiderAuctionWebTest, AuctionDontSwitchSuspendedAuctionResourceTestMixin):
     initial_status = 'active.auction'
     initial_bids = test_financial_bids
 
@@ -173,10 +167,6 @@ class InsiderAuctionDontSwitchSuspendedAuctionResourceTest(BaseInsiderAuctionWeb
         self.award_id = self.first_award_id = self.first_award['id']
         self.second_award_id = self.second_award['id']
         self.app.authorization = authorization
-
-    test_switch_suspended_verification_to_unsuccessful = snitch(switch_suspended_verification_to_unsuccessful)
-    test_switch_suspended_payment_to_unsuccessful = snitch(switch_suspended_payment_to_unsuccessful)
-    test_switch_suspended_active_to_unsuccessful = snitch(switch_suspended_active_to_unsuccessful)
 
 
 def suite():
