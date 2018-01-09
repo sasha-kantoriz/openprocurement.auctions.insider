@@ -130,7 +130,8 @@ class InsiderAuctionDontSwitchSuspendedAuction2ResourceTest(BaseInsiderAuctionWe
     test_switch_suspended_auction_to_auction = snitch(switch_suspended_auction_to_auction)
 
 
-class InsiderAuctionDontSwitchSuspendedAuctionResourceTest(BaseInsiderAuctionWebTest, AuctionDontSwitchSuspendedAuctionResourceTestMixin):
+class InsiderAuctionDontSwitchSuspendedAuctionResourceTest(BaseInsiderAuctionWebTest,
+                                                           AuctionDontSwitchSuspendedAuctionResourceTestMixin):
     initial_status = 'active.auction'
     initial_bids = test_financial_bids
 

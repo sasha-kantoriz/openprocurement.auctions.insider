@@ -3,8 +3,9 @@ from urllib import unquote
 from base64 import b64decode
 from libnacl.sign import Signer, Verifier
 
-
 # InsiderAuctionBidderResourceTest
+
+
 def create_auction_bidder_invalid(self):
     response = self.app.post_json('/auctions/some_id/bids',
                                   {'data': {'tenderers': [self.initial_organization], 'qualified': True,
@@ -460,9 +461,7 @@ def bid_Administrator_change(self):
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data']["tenderers"][0]["identifier"]["id"], "00000000")
 
-
 # InsiderAuctionBidderDocumentResourceTest
-
 
 
 def create_auction_bidder_document_nopending(self):
@@ -497,7 +496,3 @@ def create_auction_bidder_document_nopending(self):
     self.assertEqual(response.status, '403 Forbidden')
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['errors'][0]["description"], "Can't add document because award of bid is not in pending state")
-
-
-# InsiderAuctionBidderDocumentWithDSResourceTest
-
