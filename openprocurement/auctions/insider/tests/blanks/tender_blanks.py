@@ -5,7 +5,6 @@ from iso8601 import parse_date
 
 from openprocurement.api.models import get_now, SANDBOX_MODE, TZ
 
-
 # InsiderAuctionTest
 
 

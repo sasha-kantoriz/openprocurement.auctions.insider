@@ -1,7 +1,8 @@
 from openprocurement.api.models import get_now
 
-
 # InsiderAuctionAuctionPeriodResourceTest
+
+
 def set_auction_period(self):
     self.app.authorization = ('Basic', ('chronograph', ''))
     response = self.app.patch_json('/auctions/{}'.format(self.auction_id), {'data': {'id': self.auction_id}})
@@ -167,8 +168,9 @@ def reset_auction_period(self):
     self.assertIn('9999-01-01T00:00:00', item['auctionPeriod']['startDate'])
     self.assertIn('9999-01-01T00:00:00', response.json['data']['next_check'])
 
-
 # InsiderAuctionAwardSwitch2ResourceTest
+
+
 def switch_verification_to_unsuccessful2(self):
     auction = self.db.get(self.auction_id)
     auction['awards'][0]['verificationPeriod']['endDate'] = auction['awards'][0]['verificationPeriod']['startDate']
