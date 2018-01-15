@@ -22,6 +22,7 @@ test_insider_auction_data = deepcopy(test_financial_auction_data)
 
 
 test_insider_auction_data["procurementMethodType"] = "dgfInsider"
+test_insider_auction_data["auctionParameters"] = {}
 del test_insider_auction_data['minimalStep']
 
 class BaseInsiderWebTest(BaseWebTest):

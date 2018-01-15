@@ -46,7 +46,7 @@ class InsiderAuctionTest(BaseInsiderWebTest):
             'description', 'description_en', 'description_ru', 'dgfID', 'tenderAttempts',
             'features', 'guarantee', 'hasEnquiries', 'items', 'lots', 'minimalStep', 'mode',
             'procurementMethodRationale', 'procurementMethodRationale_en', 'procurementMethodRationale_ru',
-            'procurementMethodType', 'procuringEntity',
+            'procurementMethodType', 'procuringEntity', 'auctionParameters', 'merchandisingObject',
             'submissionMethodDetails', 'submissionMethodDetails_en', 'submissionMethodDetails_ru',
             'title', 'title_en', 'title_ru', 'value', 'auctionPeriod',
             'dgfDecisionDate', 'dgfDecisionID',
@@ -57,7 +57,7 @@ class InsiderAuctionTest(BaseInsiderWebTest):
 
     def test_edit_role(self):
         fields = set([
-            'features', 'hasEnquiries', 'description', 'description_en', 'description_ru',
+            'features', 'hasEnquiries', 'description', 'description_en', 'description_ru', 'auctionParameters',
             'title', 'title_en', 'title_ru', 'dgfID', 'dgfDecisionDate', 'dgfDecisionID', 'tenderAttempts',
         ])
         if SANDBOX_MODE:
@@ -610,7 +610,7 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
             u'tenderPeriod', u'minimalStep', u'items', u'value', u'procuringEntity', u'next_check', u'dgfID',
             u'procurementMethod', u'awardCriteria', u'submissionMethod', u'title', u'owner', u'auctionPeriod',
             u'eligibilityCriteria', u'eligibilityCriteria_en', u'eligibilityCriteria_ru', 'documents',
-            u'dgfDecisionDate', u'dgfDecisionID', u'tenderAttempts',
+            u'dgfDecisionDate', u'dgfDecisionID', u'tenderAttempts', 'auctionParameters'
         ]))
         self.assertNotEqual(data['id'], auction['id'])
         self.assertNotEqual(data['doc_id'], auction['id'])
@@ -964,6 +964,93 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['data']['mode'], u'test')
+
+    def test_auctionParameters(self):
+        data = deepcopy(self.initial_data)
+        self.app.authorization = ('Basic', ('broker', ''))
+
+        # Create auction with invalid auctionParameters
+        del data['auctionParameters']
+        response = self.app.post_json('/auctions', {'data': data}, status=422)
+        self.assertEqual(response.status, '422 Unprocessable Entity')
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.json['errors'], [
+            {"location": "body", "name": "auctionParameters", "description": [u'This field is required.']}
+        ])
+
+        data['auctionParameters'] = {'steps': 42, 'type': 'insider'}
+        response = self.app.post_json('/auctions', {'data': data}, status=422)
+        self.assertEqual(response.status, '422 Unprocessable Entity')
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.json['errors'], [
+            {
+                "location": "body", "name": "auctionParameters", "description": {
+                    "type": ["Value must be one of ['dutch', 'english']."],
+                    "steps": ["Int value should be greater than 80."]
+                }
+            }
+        ])
+
+        data['auctionParameters'] = {'steps': 112, 'type': 'dutch'}
+        response = self.app.post_json('/auctions', {'data': data}, status=422)
+        self.assertEqual(response.status, '422 Unprocessable Entity')
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.json['errors'], [
+            {
+                "location": "body", "name": "auctionParameters", "description": {
+                    "steps": ["Int value should be less than 100."]
+                }
+            }
+        ])
+
+        # Create auction with default auctionParameters values
+        data['auctionParameters'] = {}
+        response = self.app.post_json('/auctions', {'data': data})
+        self.assertEqual(response.status, '201 Created')
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.json['data']['auctionParameters']['steps'], 80)
+        self.assertEqual(response.json['data']['auctionParameters']['type'], 'dutch')
+
+        # Create auction with valid auctionParameters
+        data['auctionParameters'] = {'steps': 95, 'type': 'dutch'}
+        response = self.app.post_json('/auctions', {'data': data})
+        self.assertEqual(response.status, '201 Created')
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.json['data']['auctionParameters']['steps'], 95)
+        self.assertEqual(response.json['data']['auctionParameters']['type'], 'dutch')
+
+        data['auctionParameters'] = {'steps': 100, 'type': 'english'}
+        response = self.app.post_json('/auctions', {'data': data})
+        self.assertEqual(response.status, '201 Created')
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.json['data']['auctionParameters']['steps'], 100)
+        self.assertEqual(response.json['data']['auctionParameters']['type'], 'english')
+        auction_id = self.auction_id = response.json['data']['id']
+        owner_token = response.json['access']['token']
+
+        # Patch auctionParameters values unsuccessful
+        response = self.app.patch_json('/auctions/{}?acc_token={}'.format(auction_id, owner_token), {
+            'data': {'auctionParameters': {'steps': 42, 'type': 'insider'}}
+        }, status=422)
+        self.assertEqual(response.status, '422 Unprocessable Entity')
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.json['errors'], [
+            {
+                "location": "body", "name": "auctionParameters", "description": {
+                    "type": ["Value must be one of ['dutch', 'english']."],
+                    "steps": ["Int value should be greater than 80."]
+                }
+            }
+        ])
+
+        # Patch auctionParameters values successful
+        response = self.app.patch_json('/auctions/{}?acc_token={}'.format(auction_id, owner_token), {
+            'data': {'auctionParameters': {'steps': 84, 'type': 'dutch'}}
+        })
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.json['data']['auctionParameters']['steps'], 84)
+        self.assertEqual(response.json['data']['auctionParameters']['type'], 'dutch')
 
 
 class InsiderAuctionProcessTest(BaseInsiderAuctionWebTest):
