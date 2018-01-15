@@ -88,6 +88,12 @@ class AuctionParameters(Model):
 @implementer(IAuction)
 class Auction(BaseAuction):
     """Data regarding auction process - publicly inviting prospective contractors to submit bids for evaluation and selecting a winner or winners."""
+
+    class Options:
+        roles = {
+            'auction_view': whitelist('auctionID', 'dateModified', 'bids', 'auctionPeriod', 'minimalStep', 'auctionUrl', 'features', 'lots', 'items', 'procurementMethodType', 'auctionParameters')
+        }
+
     procurementMethodType = StringType(default="dgfInsider")
     bids = ListType(ModelType(Bid), default=list())  # A list of all the companies who entered submissions for the auction.
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})

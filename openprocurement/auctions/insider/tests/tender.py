@@ -46,7 +46,7 @@ class InsiderAuctionTest(BaseInsiderWebTest):
             'description', 'description_en', 'description_ru', 'dgfID', 'tenderAttempts',
             'features', 'guarantee', 'hasEnquiries', 'items', 'lots', 'minimalStep', 'mode',
             'procurementMethodRationale', 'procurementMethodRationale_en', 'procurementMethodRationale_ru',
-            'procurementMethodType', 'procuringEntity', 'auctionParameters', 'merchandisingObject',
+            'procurementMethodType', 'procuringEntity', 'auctionParameters',
             'submissionMethodDetails', 'submissionMethodDetails_en', 'submissionMethodDetails_ru',
             'title', 'title_en', 'title_ru', 'value', 'auctionPeriod',
             'dgfDecisionDate', 'dgfDecisionID',
