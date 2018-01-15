@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
-from schematics.types import StringType
+from schematics.types import StringType, IntType
 from schematics.types.compound import ModelType
 from schematics.exceptions import ValidationError
 from schematics.transforms import whitelist
@@ -79,12 +79,19 @@ class Bid(BaseBid):
             return url
 
 
+class AuctionParameters(Model):
+    """Configurable auction parameters"""
+    type = StringType(choices=['dutch', 'english'], default='dutch')
+    steps = IntType(min_value=80, max_value=100, default=80)
+
+
 @implementer(IAuction)
 class Auction(BaseAuction):
     """Data regarding auction process - publicly inviting prospective contractors to submit bids for evaluation and selecting a winner or winners."""
     procurementMethodType = StringType(default="dgfInsider")
     bids = ListType(ModelType(Bid), default=list())  # A list of all the companies who entered submissions for the auction.
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
+    auctionParameters = ModelType(AuctionParameters, required=True)
     minimalStep = ModelType(Value)
 
     def initialize(self):
