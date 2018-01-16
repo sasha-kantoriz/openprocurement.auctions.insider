@@ -998,7 +998,7 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         self.assertEqual(response.json['errors'], [
             {
                 "location": "body", "name": "auctionParameters", "description": {
-                    "steps": ["Int value should be less than 100."]
+                    "steps": ["Int value should be less than 99."]
                 }
             }
         ])
@@ -1019,11 +1019,11 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         self.assertEqual(response.json['data']['auctionParameters']['steps'], 95)
         self.assertEqual(response.json['data']['auctionParameters']['type'], 'dutch')
 
-        data['auctionParameters'] = {'steps': 100, 'type': 'english'}
+        data['auctionParameters'] = {'steps': 99, 'type': 'english'}
         response = self.app.post_json('/auctions', {'data': data})
         self.assertEqual(response.status, '201 Created')
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']['auctionParameters']['steps'], 100)
+        self.assertEqual(response.json['data']['auctionParameters']['steps'], 99)
         self.assertEqual(response.json['data']['auctionParameters']['type'], 'english')
         auction_id = self.auction_id = response.json['data']['id']
         owner_token = response.json['access']['token']
