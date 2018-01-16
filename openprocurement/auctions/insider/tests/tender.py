@@ -970,14 +970,6 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         self.app.authorization = ('Basic', ('broker', ''))
 
         # Create auction with invalid auctionParameters
-        del data['auctionParameters']
-        response = self.app.post_json('/auctions', {'data': data}, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'], [
-            {"location": "body", "name": "auctionParameters", "description": [u'This field is required.']}
-        ])
-
         data['auctionParameters'] = {'steps': 42, 'type': 'insider'}
         response = self.app.post_json('/auctions', {'data': data}, status=422)
         self.assertEqual(response.status, '422 Unprocessable Entity')
@@ -1012,6 +1004,12 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         self.assertEqual(response.json['data']['auctionParameters']['type'], 'dutch')
 
         # Create auction with valid auctionParameters
+        del data['auctionParameters']
+        response = self.app.post_json('/auctions', {'data': data})
+        self.assertEqual(response.status, '201 Created')
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertNotIn('auctionParameters', response.json['data'])
+
         data['auctionParameters'] = {'steps': 95, 'type': 'dutch'}
         response = self.app.post_json('/auctions', {'data': data})
         self.assertEqual(response.status, '201 Created')

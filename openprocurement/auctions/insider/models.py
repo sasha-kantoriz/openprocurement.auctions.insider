@@ -97,7 +97,7 @@ class Auction(BaseAuction):
     procurementMethodType = StringType(default="dgfInsider")
     bids = ListType(ModelType(Bid), default=list())  # A list of all the companies who entered submissions for the auction.
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
-    auctionParameters = ModelType(AuctionParameters, required=True)
+    auctionParameters = ModelType(AuctionParameters)
     minimalStep = ModelType(Value)
 
     def initialize(self):
