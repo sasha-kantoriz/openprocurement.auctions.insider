@@ -106,7 +106,7 @@ def post_auction_auction(self):
     self.assertIn("value", auction["bids"][0])
     self.assertIn("value", auction["bids"][1])
     self.assertEqual('active.qualification', auction["status"])
-    for i, status in enumerate(['pending.verification', 'pending.waiting']):
+    for i, status in enumerate(['pending', 'pending.waiting']):
         self.assertIn("tenderers", auction["bids"][i])
         self.assertIn("name", auction["bids"][i]["tenderers"][0])
         # self.assertIn(auction["awards"][0]["id"], response.headers['Location'])
@@ -114,7 +114,7 @@ def post_auction_auction(self):
         self.assertEqual(auction["awards"][i]['value']['amount'], patch_data["bids"][i]['value']['amount'])
         self.assertEqual(auction["awards"][i]['suppliers'], self.initial_bids[i]['tenderers'])
         self.assertEqual(auction["awards"][i]['status'], status)
-        if status == 'pending.verification':
+        if status == 'pending':
             self.assertIn("verificationPeriod", auction["awards"][i])
 
     response = self.app.post_json('/auctions/{}/auction'.format(self.auction_id), {'data': patch_data}, status=403)
@@ -242,7 +242,7 @@ def post_auction_one_bid_without_value(self):
 
     self.assertEqual('active.qualification', auction["status"])
 
-    for i, status in enumerate(['pending.verification', 'pending.waiting']):
+    for i, status in enumerate(['pending', 'pending.waiting']):
         self.assertIn("tenderers", auction["bids"][i])
         self.assertIn("name", auction["bids"][i]["tenderers"][0])
         # self.assertIn(auction["awards"][0]["id"], response.headers['Location'])
@@ -250,7 +250,7 @@ def post_auction_one_bid_without_value(self):
         self.assertEqual(auction["awards"][i]['value']['amount'], bids[i]['value']['amount'])
         self.assertEqual(auction["awards"][i]['suppliers'], bids[i]['tenderers'])
         self.assertEqual(auction["awards"][i]['status'], status)
-        if status == 'pending.verification':
+        if status == 'pending':
             self.assertIn("verificationPeriod", auction["awards"][i])
 
 

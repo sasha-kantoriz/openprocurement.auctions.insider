@@ -72,7 +72,6 @@ class InsiderAuctionContractResourceTest(BaseInsiderAuctionWebTest, AuctionContr
         self.assertEqual(response.json["data"]["documentType"], 'auctionProtocol')
         self.assertEqual(response.json["data"]["author"], 'auction_owner')
 
-        self.app.patch_json('/auctions/{}/awards/{}'.format(self.auction_id, self.award_id), {"data": {"status": "pending.payment"}})
         self.app.patch_json('/auctions/{}/awards/{}'.format(self.auction_id, self.award_id), {"data": {"status": "active"}})
 
     test_patch_auction_contract = snitch(patch_auction_contract)
@@ -133,7 +132,6 @@ class InsiderAuctionContractDocumentResourceTest(BaseInsiderAuctionWebTest, Auct
         self.assertEqual(response.json["data"]["documentType"], 'auctionProtocol')
         self.assertEqual(response.json["data"]["author"], 'auction_owner')
 
-        self.app.patch_json('/auctions/{}/awards/{}'.format(self.auction_id, self.award_id), {"data": {"status": "pending.payment"}})
         self.app.patch_json('/auctions/{}/awards/{}'.format(self.auction_id, self.award_id), {"data": {"status": "active"}})
         # Create contract for award
         response = self.app.post_json('/auctions/{}/contracts'.format(self.auction_id), {'data': {'title': 'contract title', 'description': 'contract description', 'awardID': self.award_id}})
