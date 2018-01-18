@@ -81,8 +81,8 @@ class Bid(BaseBid):
 
 class AuctionParameters(Model):
     """Configurable auction parameters"""
-    type = StringType(choices=['dutch', 'english'], default='dutch')
-    steps = IntType(min_value=80, max_value=99, default=80)
+    type = StringType(choices=['insider'], default='insider')
+    dutchSteps = IntType(min_value=80, max_value=99, default=80)
 
 
 @implementer(IAuction)
