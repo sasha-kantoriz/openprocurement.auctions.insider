@@ -57,7 +57,7 @@ class InsiderAuctionTest(BaseInsiderWebTest):
 
     def test_edit_role(self):
         fields = set([
-            'features', 'hasEnquiries', 'description', 'description_en', 'description_ru', 'auctionParameters',
+            'features', 'hasEnquiries', 'description', 'description_en', 'description_ru',
             'title', 'title_en', 'title_ru', 'dgfID', 'dgfDecisionDate', 'dgfDecisionID', 'tenderAttempts',
         ])
         if SANDBOX_MODE:
@@ -1019,28 +1019,14 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         auction_id = self.auction_id = response.json['data']['id']
         owner_token = response.json['access']['token']
 
-        # Patch auctionParameters values unsuccessful
-        response = self.app.patch_json('/auctions/{}?acc_token={}'.format(auction_id, owner_token), {
-            'data': {'auctionParameters': {'dutchSteps': 42, 'type': 'dutch'}}
-        }, status=422)
-        self.assertEqual(response.status, '422 Unprocessable Entity')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'], [
-            {
-                "location": "body", "name": "auctionParameters", "description": {
-                    "type": ["Value must be one of ['insider']."],
-                    "dutchSteps": ["Int value should be greater than 80."]
-                }
-            }
-        ])
 
-        # Patch auctionParameters values successful
+        #  Patch auctionParameters (Not allowed)
         response = self.app.patch_json('/auctions/{}?acc_token={}'.format(auction_id, owner_token), {
             'data': {'auctionParameters': {'dutchSteps': 84, 'type': 'insider'}}
         })
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['data']['auctionParameters']['dutchSteps'], 84)
+        self.assertEqual(response.json['data']['auctionParameters']['dutchSteps'], 95)
         self.assertEqual(response.json['data']['auctionParameters']['type'], 'insider')
 
 
