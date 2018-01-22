@@ -595,7 +595,6 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
             self.assertEqual(parse_date(auction['tenderPeriod']['endDate']).date(), parse_date(data['auctionPeriod']['startDate'], TZ).date())
             self.assertGreater(parse_date(auction['tenderPeriod']['endDate']).time(), parse_date(data['auctionPeriod']['startDate'], TZ).time())
 
-
     def test_create_auction_generated(self):
         data = self.initial_data.copy()
         #del data['awardPeriod']
@@ -606,13 +605,17 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         auction = response.json['data']
         if 'procurementMethodDetails' in auction:
             auction.pop('procurementMethodDetails')
-        self.assertEqual(set(auction), set([
+
+        fields = set([
             u'procurementMethodType', u'id', u'date', u'dateModified', u'auctionID', u'status', u'enquiryPeriod',
             u'tenderPeriod', u'minimalStep', u'items', u'value', u'procuringEntity', u'next_check', u'dgfID',
             u'procurementMethod', u'awardCriteria', u'submissionMethod', u'title', u'owner', u'auctionPeriod',
             u'eligibilityCriteria', u'eligibilityCriteria_en', u'eligibilityCriteria_ru', 'documents',
             u'dgfDecisionDate', u'dgfDecisionID', u'tenderAttempts'
-        ]))
+        ])
+        if SANDBOX_MODE:
+            fields.add(u'submissionMethodDetails')
+        self.assertEqual(set(auction), fields) 
         self.assertNotEqual(data['id'], auction['id'])
         self.assertNotEqual(data['doc_id'], auction['id'])
         self.assertNotEqual(data['auctionID'], auction['auctionID'])
