@@ -234,9 +234,8 @@ msgstr "Використовується остання версія у разі
 msgid "dictionary, match the version and code used"
 msgstr "словник, відповідає полям code та version, що задані"
 
-#: ../../source/standard/item.rst:167
-msgid "The detailed description is given here: http://schemas.api-docs.ea.openprocurement.io/en/latest/"
-msgstr "Детальний опис наведено за посиланням: http://schemas.api-docs.ea.openprocurement.io/en/latest/"
+msgid "decimal"
+msgstr "неціле число"
 
 #~ msgid "ID of related :ref:`lot`."
 #~ msgstr "ID пов’язаного :ref:`lot`."
