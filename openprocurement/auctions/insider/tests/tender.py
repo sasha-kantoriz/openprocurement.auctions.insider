@@ -1029,6 +1029,15 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         self.assertEqual(response.json['data']['auctionParameters']['dutchSteps'], 95)
         self.assertEqual(response.json['data']['auctionParameters']['type'], 'insider')
 
+        self.app.authorization = ('Basic', ('administrator', ''))
+        response = self.app.patch_json('/auctions/{}'.format(auction_id), {
+            'data': {'auctionParameters': {'dutchSteps': 84, 'type': 'insider'}}
+        })
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.json['data']['auctionParameters']['dutchSteps'], 84)
+        self.assertEqual(response.json['data']['auctionParameters']['type'], 'insider')
+
 
 class InsiderAuctionProcessTest(BaseInsiderAuctionWebTest):
     #setUp = BaseInsiderWebTest.setUp
