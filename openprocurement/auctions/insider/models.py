@@ -21,7 +21,8 @@ from openprocurement.auctions.dgf.models import (
     AuctionAuctionPeriod as BaseAuctionPeriod,
     DGF_PLATFORM_LEGAL_DETAILS,
     rounding_shouldStartAfter,
-    edit_role
+    edit_role,
+    Administrator_role
 )
 
 from openprocurement.auctions.insider.utils import generate_auction_url, calc_auction_end_time
@@ -88,6 +89,7 @@ class AuctionParameters(Model):
 
 edit_role = (edit_role + blacklist('auctionParameters'))
 auction_view_role = (auction_view_role + whitelist('auctionParameters'))
+Administrator_role = (Administrator_role + whitelist('auctionParameters'))
 
 
 @implementer(IAuction)
@@ -98,6 +100,7 @@ class Auction(BaseAuction):
         roles = {
             'auction_view': auction_view_role,
             'edit_active.tendering': edit_role,
+            'Administrator': Administrator_role,
         }
 
     procurementMethodType = StringType(default="dgfInsider")
