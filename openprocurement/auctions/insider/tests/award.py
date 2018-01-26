@@ -28,6 +28,7 @@ class InsiderAuctionAwardProcessTest(BaseInsiderAuctionWebTest, AuctionAwardProc
     #initial_data = auction_data
     initial_status = 'active.auction'
     initial_bids = test_financial_bids
+    docservice = True
 
     def upload_auction_protocol(self, award):
         award_id = award['id']
