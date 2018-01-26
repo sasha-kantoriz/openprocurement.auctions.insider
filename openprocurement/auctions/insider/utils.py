@@ -3,7 +3,6 @@ from logging import getLogger
 from pkg_resources import get_distribution
 from openprocurement.api.models import get_now, TZ
 from openprocurement.api.utils import context_unpack
-from openprocurement.auctions.dgf.utils import check_award_status
 
 from openprocurement.auctions.flash.models import AUCTION_STAND_STILL_TIME
 from openprocurement.auctions.insider.constants import (
@@ -51,7 +50,7 @@ def check_status(request):
     auction = request.validated['auction']
     now = get_now()
     for award in auction.awards:
-        check_award_status(request, award, now)
+        request.content_configurator.check_award_status(request, award, now)
     if auction.status == 'active.tendering' and auction.enquiryPeriod.endDate <= now:
         LOGGER.info('Switched auction {} to {}'.format(auction['id'], 'active.auction'),
                     extra=context_unpack(request, {'MESSAGE_ID': 'switched_auction_active.auction'}))
