@@ -22,6 +22,7 @@ from openprocurement.auctions.insider.tests.blanks.auction_blanks import (
     post_auction_all_invalid_bids,
     post_auction_one_bid_without_value,
     post_auction_zero_bids,
+    post_auction_one_valid_bid,
     # InsiderAuctionDraftBidAuctionResourceTest
     post_auction_all_draft_bids,
     # InsiderAuctionSameValueAuctionResourceTest
@@ -60,6 +61,7 @@ class InsiderAuctionBidInvalidationAuctionResourceTest(BaseInsiderAuctionWebTest
     test_post_auction_all_invalid_bids = unittest.skip("zero minimalstep")(snitch(post_auction_all_invalid_bids))
     test_post_auction_one_bid_without_value = snitch(post_auction_one_bid_without_value)
     test_post_auction_zero_bids = snitch(post_auction_zero_bids)
+    test_post_auction_one_valid_bid = snitch(post_auction_one_valid_bid)
 
 
 class InsiderAuctionDraftBidAuctionResourceTest(BaseInsiderAuctionWebTest):

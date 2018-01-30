@@ -254,6 +254,27 @@ def post_auction_one_bid_without_value(self):
             self.assertIn("verificationPeriod", auction["awards"][i])
 
 
+def post_auction_one_valid_bid(self):
+    self.app.authorization = ('Basic', ('auction', ''))
+    
+    response = self.app.get('/auctions/{}'.format(self.auction_id))
+    self.assertEqual(response.status, '200 OK')
+    auction = response.json['data']
+    value_threshold = auction['value']['amount'] + auction['minimalStep']['amount']
+    
+    bids = deepcopy(self.initial_bids)
+    bids[0]['value'] = {'amount': value_threshold}
+
+    response = self.app.post_json('/auctions/{}/auction'.format(self.auction_id), {'data': {'bids': [bids[0]]}})
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    auction = response.json['data']
+
+    self.assertEqual('active.qualification', auction["status"])
+    self.assertEqual(len(auction['awards']), 1)
+    self.assertEqual(auction['awards'][0]['status'], 'pending')
+
+
 def post_auction_zero_bids(self):
     self.app.authorization = ('Basic', ('auction', ''))
 
