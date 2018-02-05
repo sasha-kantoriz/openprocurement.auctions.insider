@@ -6,6 +6,9 @@ version = '0.1.8'
 entry_points = {
     'openprocurement.auctions.core.plugins': [
         'auctions.insider = openprocurement.auctions.insider.includeme:includeme'
+    ],
+    'openprocurement.api.migrations': [
+        'auctions = openprocurement.auctions.insider.migration:migrate_data'
     ]
 }
 
