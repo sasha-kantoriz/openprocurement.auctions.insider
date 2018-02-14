@@ -6,10 +6,7 @@ from openprocurement.auctions.core.plugins.awarding.v2.tests.award import (
 def migrate_pendingVerification_pending_one_bid(self):
     auction = self.db.get(self.auction_id)
 
-    pending_verification_award = award_fixture(
-        auction,
-        'pending.verification',
-        0)
+    pending_verification_award = award_fixture(auction, 'pending.verification', 0)
     auction['awards'] = [pending_verification_award]
     auction.update(auction)
     self.db.save(auction)
@@ -24,10 +21,7 @@ def migrate_pendingVerification_pending_one_bid(self):
 def migrate_pendingPayment_active_one_bid(self):
     auction = self.db.get(self.auction_id)
 
-    pending_payment_award = award_fixture(
-        auction,
-        'pending.payment',
-        0)
+    pending_payment_award = award_fixture(auction, 'pending.payment', 0)
 
     auction['awards'] = [pending_payment_award]
     auction.update(auction)

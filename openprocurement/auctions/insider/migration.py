@@ -51,11 +51,7 @@ def from0to1(registry):
     docs = []
     for i in results:
         auction = i.doc
-        migrate_awarding2_to_awarding3(
-            auction,
-            registry.server_id,
-            ('dgfInsider')
-        )
+        migrate_awarding2_to_awarding3(auction, registry.server_id, ('dgfInsider'))
         model = registry.auction_procurementMethodTypes.get(auction['procurementMethodType'])
         if model:
             try:

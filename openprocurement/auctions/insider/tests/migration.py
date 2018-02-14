@@ -19,8 +19,7 @@ from openprocurement.auctions.insider.tests.blanks.migration_blanks import (
 )
 
 
-class MigrateTestFrom2To3WithTwoBids(BaseInsiderAuctionWebTest,
-                                     MigrateAwardingV2toV3Mixin):
+class MigrateTestFrom2To3WithTwoBids(BaseInsiderAuctionWebTest, MigrateAwardingV2toV3Mixin):
     initial_status = 'active.qualification'
     initial_bids = test_bids
 
