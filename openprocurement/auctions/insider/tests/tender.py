@@ -979,7 +979,7 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
             {
                 "location": "body", "name": "auctionParameters", "description": {
                     "type": ["Value must be one of ['insider']."],
-                    "dutchSteps": ["Value must be one of [50, 60, 70, 80, 99, 100]."]
+                    "dutchSteps": ["Value must be one of [10, 20, 30, 40, 50, 60, 70, 80, 90, 99, 100]."]
                 }
             }
         ])
@@ -991,7 +991,7 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest):
         self.assertEqual(response.json['errors'], [
             {
                 "location": "body", "name": "auctionParameters", "description": {
-                    "dutchSteps": ["Value must be one of [50, 60, 70, 80, 99, 100]."]
+                    "dutchSteps": ["Value must be one of [10, 20, 30, 40, 50, 60, 70, 80, 90, 99, 100]."]
                 }
             }
         ])

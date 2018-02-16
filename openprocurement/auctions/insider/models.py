@@ -84,7 +84,7 @@ class Bid(BaseBid):
 class AuctionParameters(Model):
     """Configurable auction parameters"""
     type = StringType(choices=['insider'], default='insider')
-    dutchSteps = IntType(choices=[50, 60, 70, 80, 99, 100], default=80)
+    dutchSteps = IntType(choices=[10, 20, 30, 40, 50, 60, 70, 80, 90, 99, 100], default=80)
 
 
 edit_role = (edit_role + blacklist('auctionParameters'))
