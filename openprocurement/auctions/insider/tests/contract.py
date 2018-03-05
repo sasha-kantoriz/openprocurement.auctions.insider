@@ -12,13 +12,16 @@ from openprocurement.auctions.core.tests.contract import (
     AuctionContractResourceTestMixin,
     AuctionContractDocumentResourceTestMixin
 )
-from openprocurement.auctions.core.tests.blanks.contract_blanks import (
-    # AuctionContractResourceTest
-    patch_auction_contract,
+from openprocurement.auctions.core.plugins.contracting.v3.tests.contract import (
+    AuctionContractV3ResourceTestCaseMixin
 )
 
 
-class InsiderAuctionContractResourceTest(BaseInsiderAuctionWebTest, AuctionContractResourceTestMixin):
+class InsiderAuctionContractResourceTest(
+    BaseInsiderAuctionWebTest,
+    AuctionContractResourceTestMixin,
+    AuctionContractV3ResourceTestCaseMixin,
+):
     initial_status = 'active.auction'
     initial_bids = test_financial_bids
 
@@ -73,8 +76,9 @@ class InsiderAuctionContractResourceTest(BaseInsiderAuctionWebTest, AuctionContr
         self.assertEqual(response.json["data"]["author"], 'auction_owner')
 
         self.app.patch_json('/auctions/{}/awards/{}'.format(self.auction_id, self.award_id), {"data": {"status": "active"}})
-
-    test_patch_auction_contract = snitch(patch_auction_contract)
+        response = self.app.get('/auctions/{}'.format(self.auction_id))
+        auction = response.json['data']
+        self.award_contract_id = auction['contracts'][0]['id']
 
 
 class InsiderAuctionContractDocumentResourceTest(BaseInsiderAuctionWebTest, AuctionContractDocumentResourceTestMixin):
