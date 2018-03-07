@@ -8,11 +8,18 @@ from schematics.transforms import blacklist, whitelist
 from schematics.types.serializable import serializable
 from zope.interface import implementer
 from openprocurement.api.models import (
-    Model, ListType
+    Model,
+    ListType
 )
 
 from openprocurement.api.utils import calculate_business_date
-from openprocurement.api.models import get_now, Value, Period, TZ, SANDBOX_MODE
+from openprocurement.api.models import (
+    get_now,
+    Value,
+    Period,
+    TZ,
+    SANDBOX_MODE
+)
 from openprocurement.auctions.core.models import IAuction
 from openprocurement.auctions.flash.models import COMPLAINT_STAND_STILL_TIME, auction_view_role
 from openprocurement.auctions.dgf.models import (
@@ -27,8 +34,11 @@ from openprocurement.auctions.dgf.models import (
 )
 
 from openprocurement.auctions.insider.utils import generate_auction_url, calc_auction_end_time
-from openprocurement.auctions.insider.constants import DUTCH_PERIOD, QUICK_DUTCH_PERIOD, NUMBER_OF_STAGES
-
+from openprocurement.auctions.insider.constants import (
+    DUTCH_PERIOD,
+    QUICK_DUTCH_PERIOD,
+    NUMBER_OF_STAGES
+)
 
 
 class AuctionAuctionPeriod(BaseAuctionPeriod):
@@ -94,6 +104,11 @@ Administrator_role = (Administrator_role + whitelist('auctionParameters'))
 
 
 @implementer(IAuction)
+class IInsiderAuction(IAuction):
+    """Marker interface for Insider auctions"""
+
+
+@implementer(IInsiderAuction)
 class Auction(BaseAuction):
     """Data regarding auction process - publicly inviting prospective contractors to submit bids for evaluation and selecting a winner or winners."""
 
