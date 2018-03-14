@@ -13,7 +13,7 @@ from openprocurement.auctions.core.tests.blanks.tender_blanks import (
     one_invalid_bid_auction,
 )
 
-from openprocurement.auctions.dgf.constants import ELIGIBILITY_CRITERIA
+from openprocurement.auctions.core.constants import DGF_ELIGIBILITY_CRITERIA
 
 from openprocurement.auctions.insider.models import DGFInsider
 from openprocurement.auctions.insider.tests.base import (
@@ -50,7 +50,7 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest, AuctionResourceTestMixin, D
     initial_status = 'active.tendering'
     initial_data = test_insider_auction_data
     initial_organization = test_organization
-    eligibility_criteria = ELIGIBILITY_CRITERIA
+    eligibility_criteria = DGF_ELIGIBILITY_CRITERIA
     test_financial_organization = test_financial_organization
 
     test_create_auction_invalid = snitch(create_auction_invalid)

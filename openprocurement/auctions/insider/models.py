@@ -19,14 +19,18 @@ from openprocurement.api.models import (
     TZ,
     SANDBOX_MODE
 )
-from openprocurement.auctions.core.models import IAuction, COMPLAINT_STAND_STILL_TIME, get_auction
+from openprocurement.auctions.core.models import (
+    IAuction,
+    COMPLAINT_STAND_STILL_TIME,
+    get_auction,
+    dgfOrganization as Organization
+)
+from openprocurement.auctions.core.constants import DGF_PLATFORM_LEGAL_DETAILS
+from openprocurement.auctions.core.utils import rounding_shouldStartAfter_after_midnigth
 from openprocurement.auctions.dgf.models import (
     DGFFinancialAssets as BaseAuction,
     Bid as BaseBid,
-    Organization,
     AuctionAuctionPeriod as BaseAuctionPeriod,
-    DGF_PLATFORM_LEGAL_DETAILS,
-    rounding_shouldStartAfter,
 )
 
 from openprocurement.auctions.insider.utils import generate_auction_url, calc_auction_end_time
@@ -53,7 +57,7 @@ class AuctionAuctionPeriod(BaseAuctionPeriod):
             start_after = auction.enquiryPeriod.endDate
         else:
             return
-        return rounding_shouldStartAfter(start_after, auction).isoformat()
+        return rounding_shouldStartAfter_after_midnigth(start_after, auction).isoformat()
 
     def validate_startDate(self, data, startDate):
         auction = get_auction(data['__parent__'])
