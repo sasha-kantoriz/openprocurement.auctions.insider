@@ -19,11 +19,10 @@ from openprocurement.api.models import (
     TZ,
     SANDBOX_MODE
 )
-from openprocurement.auctions.core.models import IAuction
-from openprocurement.auctions.flash.models import COMPLAINT_STAND_STILL_TIME
+from openprocurement.auctions.core.models import IAuction, COMPLAINT_STAND_STILL_TIME, get_auction
 from openprocurement.auctions.dgf.models import (
     DGFFinancialAssets as BaseAuction,
-    get_auction, Bid as BaseBid,
+    Bid as BaseBid,
     Organization,
     AuctionAuctionPeriod as BaseAuctionPeriod,
     DGF_PLATFORM_LEGAL_DETAILS,
