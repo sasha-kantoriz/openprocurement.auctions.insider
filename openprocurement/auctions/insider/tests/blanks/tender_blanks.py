@@ -262,7 +262,7 @@ def create_auction_auctionPeriod(self):
     self.assertNotIn('startDate', auction['auctionPeriod'])
     self.assertEqual(parse_date(data['auctionPeriod']['startDate']).date(), parse_date(auction['auctionPeriod']['shouldStartAfter'], TZ).date())
     if SANDBOX_MODE:
-        auction_startDate = parse_date(data['auctionPeriod']['shouldStartAfter'], None)
+        auction_startDate = parse_date(data['auctionPeriod']['startDate'], None)
         if not auction_startDate.tzinfo:
             auction_startDate = TZ.localize(auction_startDate)
         tender_endDate = parse_date(auction['tenderPeriod']['endDate'], None)
@@ -282,8 +282,9 @@ def create_auction_generated(self):
     self.assertEqual(response.status, '201 Created')
     self.assertEqual(response.content_type, 'application/json')
     auction = response.json['data']
-    if 'procurementMethodDetails' in auction:
-        auction.pop('procurementMethodDetails')
+    for key in ['procurementMethodDetails', 'submissionMethodDetails']:
+        if key in auction:
+            auction.pop(key)
     self.assertEqual(set(auction), set([
         u'procurementMethodType', u'id', u'date', u'dateModified', u'auctionID', u'status', u'enquiryPeriod',
         u'tenderPeriod', u'minimalStep', u'items', u'value', u'procuringEntity', u'next_check', u'dgfID',
