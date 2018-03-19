@@ -26,7 +26,6 @@ from openprocurement.auctions.core.models import (
     get_auction,
     dgfOrganization as Organization,
     auction_view_role,
-    Administrator_role,
 )
 from openprocurement.auctions.core.constants import DGF_PLATFORM_LEGAL_DETAILS
 from openprocurement.auctions.core.utils import rounding_shouldStartAfter_after_midnigth
@@ -34,7 +33,8 @@ from openprocurement.auctions.dgf.models import (
     DGFFinancialAssets as BaseAuction,
     Bid as BaseBid,
     AuctionAuctionPeriod as BaseAuctionPeriod,
-    edit_role
+    edit_role,
+    Administrator_role
 )
 
 from openprocurement.auctions.insider.utils import generate_auction_url, calc_auction_end_time
