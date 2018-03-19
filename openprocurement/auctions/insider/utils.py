@@ -4,7 +4,7 @@ from pkg_resources import get_distribution
 from openprocurement.api.models import get_now, TZ
 from openprocurement.api.utils import context_unpack
 
-from openprocurement.auctions.flash.models import AUCTION_STAND_STILL_TIME
+from openprocurement.auctions.core.models import AUCTION_STAND_STILL_TIME
 from openprocurement.auctions.insider.constants import (
     STAGE_TIMEDELTA,
     SERVICE_TIMEDELTA,

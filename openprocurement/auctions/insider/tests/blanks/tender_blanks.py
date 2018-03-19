@@ -363,7 +363,7 @@ def check_daylight_savings_timezone(self):
     now = get_now()
     list_of_timezone_bools = []
     # check if DST working with different time periods
-    for i in (10, 90, 180, 210):
+    for i in (10, 90, 180, 210, 240):
         self.initial_data.update({
             "auctionPeriod": {
                 "startDate": (now + timedelta(days=i)).isoformat(),
