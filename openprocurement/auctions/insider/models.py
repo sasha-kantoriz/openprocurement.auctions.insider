@@ -1,44 +1,47 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
-from schematics.types import StringType
-from schematics.types.compound import ModelType
+
 from schematics.exceptions import ValidationError
 from schematics.transforms import whitelist
+from schematics.types import StringType
+from schematics.types.compound import ModelType
 from schematics.types.serializable import serializable
 from zope.interface import implementer
-from openprocurement.api.models import (
-    Model,
-    ListType
-)
 
-from openprocurement.api.utils import calculate_business_date
+from openprocurement.api.constants import (
+    SANDBOX_MODE,
+    AUCTIONS_COMPLAINT_STAND_STILL_TIME
+)
 from openprocurement.api.models import (
     get_now,
+    Model,
+    ListType,
     Value,
     Period,
-    TZ,
-    SANDBOX_MODE
+    TZ
 )
+from openprocurement.api.utils import calculate_business_date
+
+from openprocurement.auctions.core.constants import DGF_PLATFORM_LEGAL_DETAILS
 from openprocurement.auctions.core.models import (
     IAuction,
-    COMPLAINT_STAND_STILL_TIME,
     get_auction,
     dgfOrganization as Organization
 )
-from openprocurement.auctions.core.constants import DGF_PLATFORM_LEGAL_DETAILS
 from openprocurement.auctions.core.utils import rounding_shouldStartAfter_after_midnigth
+
 from openprocurement.auctions.dgf.models import (
     DGFFinancialAssets as BaseAuction,
     Bid as BaseBid,
     AuctionAuctionPeriod as BaseAuctionPeriod,
 )
 
-from openprocurement.auctions.insider.utils import generate_auction_url, calc_auction_end_time
 from openprocurement.auctions.insider.constants import (
     DUTCH_PERIOD,
     QUICK_DUTCH_PERIOD,
     NUMBER_OF_STAGES
 )
+from openprocurement.auctions.insider.utils import generate_auction_url, calc_auction_end_time
 
 
 class AuctionAuctionPeriod(BaseAuctionPeriod):
@@ -180,15 +183,15 @@ class Auction(BaseAuction):
             from openprocurement.api.utils import calculate_business_date
             for complaint in self.complaints:
                 if complaint.status == 'claim' and complaint.dateSubmitted:
-                    checks.append(calculate_business_date(complaint.dateSubmitted, COMPLAINT_STAND_STILL_TIME, self))
+                    checks.append(calculate_business_date(complaint.dateSubmitted, AUCTIONS_COMPLAINT_STAND_STILL_TIME, self))
                 elif complaint.status == 'answered' and complaint.dateAnswered:
-                    checks.append(calculate_business_date(complaint.dateAnswered, COMPLAINT_STAND_STILL_TIME, self))
+                    checks.append(calculate_business_date(complaint.dateAnswered, AUCTIONS_COMPLAINT_STAND_STILL_TIME, self))
             for award in self.awards:
                 for complaint in award.complaints:
                     if complaint.status == 'claim' and complaint.dateSubmitted:
-                        checks.append(calculate_business_date(complaint.dateSubmitted, COMPLAINT_STAND_STILL_TIME, self))
+                        checks.append(calculate_business_date(complaint.dateSubmitted, AUCTIONS_COMPLAINT_STAND_STILL_TIME, self))
                     elif complaint.status == 'answered' and complaint.dateAnswered:
-                        checks.append(calculate_business_date(complaint.dateAnswered, COMPLAINT_STAND_STILL_TIME, self))
+                        checks.append(calculate_business_date(complaint.dateAnswered, AUCTIONS_COMPLAINT_STAND_STILL_TIME, self))
         return min(checks).isoformat() if checks else None
 
 

@@ -3,7 +3,8 @@ from copy import deepcopy
 from datetime import timedelta
 from iso8601 import parse_date
 
-from openprocurement.api.models import get_now, SANDBOX_MODE, TZ
+from openprocurement.api.constants import SANDBOX_MODE
+from openprocurement.api.models import get_now, TZ
 
 # InsiderAuctionTest
 
@@ -54,7 +55,7 @@ def create_auction_invalid(self):
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['status'], 'error')
     self.assertEqual(response.json['errors'], [
-        {u'description': u'Expecting value: line 1 column 1 (char 0)',
+        {u'description': u'No JSON object could be decoded',
             u'location': u'body', u'name': u'data'}
     ])
 
@@ -90,7 +91,7 @@ def create_auction_invalid(self):
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['status'], 'error')
     self.assertEqual(response.json['errors'], [
-        {u'description': u'Not implemented', u'location': u'data', u'name': u'procurementMethodType'}
+        {u'description': u'procurementMethodType is not implemented', u'location': u'body', u'name': u'data'}
     ])
 
     response = self.app.post_json(request_path, {'data': {'invalid_field': 'invalid_value', 'procurementMethodType': self.initial_data['procurementMethodType']}}, status=422)
