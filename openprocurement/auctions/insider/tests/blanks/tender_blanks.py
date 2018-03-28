@@ -5,6 +5,7 @@ from iso8601 import parse_date
 
 from openprocurement.api.constants import SANDBOX_MODE
 from openprocurement.api.models import get_now, TZ
+from openprocurement.api.tests.base import JSON_RENDERER_ERROR
 
 # InsiderAuctionTest
 
@@ -55,8 +56,7 @@ def create_auction_invalid(self):
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['status'], 'error')
     self.assertEqual(response.json['errors'], [
-        {u'description': u'No JSON object could be decoded',
-            u'location': u'body', u'name': u'data'}
+        JSON_RENDERER_ERROR
     ])
 
     response = self.app.post_json(request_path, 'data', status=422)
