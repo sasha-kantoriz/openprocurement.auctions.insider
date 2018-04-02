@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from openprocurement.api.models import get_now
+from openprocurement.api.models.auction_models.models import get_now
 
 from openprocurement.auctions.core.plugins.awarding.v3.migration import (
     migrate_awarding2_to_awarding3

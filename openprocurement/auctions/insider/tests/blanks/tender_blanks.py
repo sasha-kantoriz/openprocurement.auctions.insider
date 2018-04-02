@@ -4,7 +4,7 @@ from datetime import timedelta
 from iso8601 import parse_date
 
 from openprocurement.api.constants import SANDBOX_MODE
-from openprocurement.api.models import get_now, TZ
+from openprocurement.api.models.auction_models.models import get_now, TZ
 from openprocurement.api.tests.base import JSON_RENDERER_ERROR
 
 # InsiderAuctionTest
