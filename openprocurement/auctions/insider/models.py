@@ -10,17 +10,16 @@ from zope.interface import implementer
 
 from openprocurement.api.constants import (
     SANDBOX_MODE,
-    AUCTIONS_COMPLAINT_STAND_STILL_TIME
+    AUCTIONS_COMPLAINT_STAND_STILL_TIME,
+    TZ
 )
 from openprocurement.api.models.auction_models.models import (
-    get_now,
     Model,
     ListType,
     Value,
     Period,
-    TZ
 )
-from openprocurement.api.utils import calculate_business_date
+from openprocurement.api.utils import calculate_business_date, get_now
 
 from openprocurement.auctions.core.constants import DGF_PLATFORM_LEGAL_DETAILS
 from openprocurement.auctions.core.models import (
