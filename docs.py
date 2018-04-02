@@ -5,7 +5,7 @@ from datetime import timedelta, datetime
 from uuid import uuid4
 from copy import deepcopy
 
-from openprocurement.api.models import get_now
+from openprocurement.api.utils import get_now
 import openprocurement.auctions.insider.tests.base as base_test
 from openprocurement.auctions.dgf.tests.base import base_test_bids, test_financial_organization
 from openprocurement.auctions.flash.tests.base import PrefixedRequestClass

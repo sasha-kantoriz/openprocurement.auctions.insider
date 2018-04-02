@@ -2,7 +2,7 @@
 import unittest
 from datetime import timedelta
 
-from openprocurement.api.models import get_now
+from openprocurement.api.utils import get_now
 from openprocurement.auctions.insider.tests.base import (
     BaseInsiderAuctionWebTest, test_financial_bids,
     test_insider_auction_data, test_financial_organization,

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from openprocurement.api.models import get_now
+from openprocurement.api.utils import get_now
 
 from openprocurement.auctions.core.validation import (
     validate_patch_auction_data,

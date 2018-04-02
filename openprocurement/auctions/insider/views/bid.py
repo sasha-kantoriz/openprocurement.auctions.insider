@@ -14,7 +14,7 @@ from openprocurement.api.utils import (
     context_unpack,
     set_ownership
 )
-from openprocurement.api.models import get_now
+from openprocurement.api.utils import get_now
 from openprocurement.auctions.core.validation import validate_bid_data, validate_patch_bid_data
 from openprocurement.auctions.insider.constants import TENDER_PERIOD_STATUSES
 
