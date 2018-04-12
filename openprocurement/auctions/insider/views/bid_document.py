@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-from openprocurement.api.utils import get_now
 from openprocurement.auctions.core.utils import (
+    get_now,
     opresource,
 )
+
 from openprocurement.auctions.dgf.views.financial.bid_document import (
     FinancialAuctionBidDocumentResource,
 )
+
 from openprocurement.auctions.insider.constants import TENDER_PERIOD_STATUSES
 
 

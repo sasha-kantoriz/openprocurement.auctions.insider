@@ -2,7 +2,8 @@
 from urllib import unquote
 from base64 import b64decode
 from libnacl.sign import Signer, Verifier
-from openprocurement.api.tests.base import JSON_RENDERER_ERROR
+
+from openprocurement.auctions.core.tests.base import JSON_RENDERER_ERROR
 
 # InsiderAuctionBidderResourceTest
 

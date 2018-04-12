@@ -3,8 +3,6 @@ import unittest
 
 from datetime import timedelta
 
-from openprocurement.api.utils import get_now
-
 from openprocurement.auctions.core.tests.award import (
     AuctionAwardDocumentResourceTestMixin
 )
@@ -12,6 +10,7 @@ from openprocurement.auctions.core.plugins.awarding.v3.tests.award import (
     AuctionAwardProcessTestMixin,
     CreateAuctionAwardTestMixin
 )
+from openprocurement.auctions.core.utils import get_now
 
 from openprocurement.auctions.insider.tests.base import (
     BaseInsiderAuctionWebTest,

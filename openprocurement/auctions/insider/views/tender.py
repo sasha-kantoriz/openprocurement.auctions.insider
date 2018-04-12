@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-from openprocurement.api.utils import (
-    context_unpack,
-    json_view,
-)
 from openprocurement.auctions.core.utils import (
     apply_patch,
+    context_unpack,
+    json_view,
     opresource,
     save_auction,
 )
 from openprocurement.auctions.core.validation import (
     validate_patch_auction_data,
 )
+
 from openprocurement.auctions.dgf.views.financial.tender import FinancialAuctionResource
+
 from openprocurement.auctions.insider.utils import check_status
 
 
