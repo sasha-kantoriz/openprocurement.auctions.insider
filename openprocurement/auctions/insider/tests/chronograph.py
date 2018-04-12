@@ -2,10 +2,6 @@
 import unittest
 from datetime import timedelta
 
-from openprocurement.api.utils import get_now
-from openprocurement.auctions.insider.tests.base import (
-    BaseInsiderAuctionWebTest, test_financial_bids,
-)
 from openprocurement.auctions.core.tests.base import snitch
 from openprocurement.auctions.core.tests.blanks.chronograph_blanks import (
     # InsiderAuctionSwitchAuctionResourceTest
@@ -22,8 +18,11 @@ from openprocurement.auctions.core.plugins.awarding.v3.tests.blanks.chronograph_
     switch_verification_to_unsuccessful_2,
     switch_active_to_unsuccessful_2,
 )
+from openprocurement.auctions.core.utils import get_now
 
-
+from openprocurement.auctions.insider.tests.base import (
+    BaseInsiderAuctionWebTest, test_financial_bids,
+)
 from openprocurement.auctions.insider.tests.blanks.chronograph_blanks import (
     # InsiderAuctionAuctionPeriodResourceTest
     set_auction_period,

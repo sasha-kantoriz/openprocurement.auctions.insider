@@ -8,26 +8,24 @@ from schematics.types.compound import ModelType
 from schematics.types.serializable import serializable
 from zope.interface import implementer
 
-from openprocurement.api.constants import (
-    SANDBOX_MODE,
-    AUCTIONS_COMPLAINT_STAND_STILL_TIME,
-    TZ
-)
-from openprocurement.api.models.auction_models.models import (
+from openprocurement.auctions.core.constants import DGF_PLATFORM_LEGAL_DETAILS
+from openprocurement.auctions.core.models import (
     Model,
     ListType,
     Value,
     Period,
-)
-from openprocurement.api.utils import calculate_business_date, get_now
-
-from openprocurement.auctions.core.constants import DGF_PLATFORM_LEGAL_DETAILS
-from openprocurement.auctions.core.models import (
     IAuction,
     get_auction,
     dgfOrganization as Organization
 )
-from openprocurement.auctions.core.utils import rounding_shouldStartAfter_after_midnigth
+from openprocurement.auctions.core.utils import (
+    rounding_shouldStartAfter_after_midnigth,
+    AUCTIONS_COMPLAINT_STAND_STILL_TIME,
+    calculate_business_date,
+    SANDBOX_MODE,
+    get_now,
+    TZ,
+)
 
 from openprocurement.auctions.dgf.models import (
     DGFFinancialAssets as BaseAuction,
@@ -177,7 +175,7 @@ class Auction(BaseAuction):
             if standStillEnds and last_award_status == 'unsuccessful':
                 checks.append(max(standStillEnds))
         if self.status.startswith('active'):
-            from openprocurement.api.utils import calculate_business_date
+            from openprocurement.auctions.core.utils import calculate_business_date
             for complaint in self.complaints:
                 if complaint.status == 'claim' and complaint.dateSubmitted:
                     checks.append(calculate_business_date(complaint.dateSubmitted, AUCTIONS_COMPLAINT_STAND_STILL_TIME, self))
