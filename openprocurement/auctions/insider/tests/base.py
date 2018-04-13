@@ -22,7 +22,7 @@ test_procuringEntity = test_organization.copy()
 test_insider_auction_data = deepcopy(test_financial_auction_data)
 
 
-test_insider_auction_data["procurementMethodType"] = "dgfInsider"
+test_insider_auction_data["procurementMethodType"] = "dgfInsider1"
 del test_insider_auction_data['minimalStep']
 
 class BaseInsiderWebTest(BaseWebTest):

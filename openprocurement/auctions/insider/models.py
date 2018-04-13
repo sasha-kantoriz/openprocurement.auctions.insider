@@ -99,7 +99,8 @@ class IInsiderAuction(IAuction):
 @implementer(IInsiderAuction)
 class Auction(BaseAuction):
     """Data regarding auction process - publicly inviting prospective contractors to submit bids for evaluation and selecting a winner or winners."""
-    procurementMethodType = StringType(default="dgfInsider")
+    pmt = "dgfInsider"
+    procurementMethodType = StringType()
     bids = ListType(ModelType(Bid), default=list())  # A list of all the companies who entered submissions for the auction.
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
     minimalStep = ModelType(Value)

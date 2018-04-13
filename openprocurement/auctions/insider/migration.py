@@ -52,7 +52,7 @@ def from0to1(registry):
     docs = []
     for i in results:
         auction = i.doc
-        changed = migrate_awarding2_to_awarding3(auction, registry.server_id, ('dgfInsider'))
+        changed = migrate_awarding2_to_awarding3(auction, registry.server_id, (auction['procurementMethodType']))
         if not changed:
             continue
         model = registry.auction_procurementMethodTypes.get(auction['procurementMethodType'])
