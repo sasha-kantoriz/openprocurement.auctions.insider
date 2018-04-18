@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
-
 from openprocurement.auctions.core.utils import (
-    opresource,
     apply_patch,
+    context_unpack,
+    get_now,
+    json_view,
+    opresource,
     save_auction,
+    set_ownership,
 )
+from openprocurement.auctions.core.validation import validate_bid_data, validate_patch_bid_data
+
 from openprocurement.auctions.dgf.views.financial.bid import (
     FinancialAuctionBidResource,
 )
 
-from openprocurement.api.utils import (
-    json_view,
-    context_unpack,
-    set_ownership
-)
-from openprocurement.api.models import get_now
-from openprocurement.auctions.core.validation import validate_bid_data, validate_patch_bid_data
 from openprocurement.auctions.insider.constants import TENDER_PERIOD_STATUSES
+
 
 @opresource(name='dgfInsider:Auction Bids',
             collection_path='/auctions/{auction_id}/bids',

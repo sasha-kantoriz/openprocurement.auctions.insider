@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-from openprocurement.api.utils import (
-    json_view,
-    context_unpack,
-)
 from openprocurement.auctions.core.utils import (
-    save_auction,
     apply_patch,
+    context_unpack,
+    json_view,
     opresource,
-    remove_draft_bids
+    remove_draft_bids,
+    save_auction,
 )
-from openprocurement.auctions.insider.validation import (
-    validate_auction_auction_data,
-)
+
 from openprocurement.auctions.dgf.views.financial.auction import (
     FinancialAuctionAuctionResource,
 )
+
 from openprocurement.auctions.insider.utils import invalidate_empty_bids, merge_auction_results
+from openprocurement.auctions.insider.validation import (
+    validate_auction_auction_data,
+)
 
 
 @opresource(name='dgfInsider:Auction Auction',

@@ -1,5 +1,7 @@
 from pyramid.interfaces import IRequest
-from openprocurement.api.interfaces import IContentConfigurator
+
+from openprocurement.auctions.core.includeme import IContentConfigurator
+
 from openprocurement.auctions.insider.models import DGFInsider, IInsiderAuction
 from openprocurement.auctions.insider.adapters import AuctionInsiderConfigurator
 from openprocurement.auctions.insider.constants import VIEW_LOCATIONS

@@ -3,7 +3,8 @@ import os
 from datetime import datetime, timedelta
 from copy import deepcopy
 
-from openprocurement.api.utils import apply_data_patch
+from openprocurement.auctions.core.utils import apply_data_patch
+
 from openprocurement.auctions.dgf.tests.base import (
     BaseWebTest,
     BaseFinancialAuctionWebTest,

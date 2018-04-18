@@ -1,34 +1,35 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
 from pytz import UTC
+
 from schematics.types import StringType, IntType
 from schematics.types.compound import ModelType
 from schematics.exceptions import ValidationError
 from schematics.transforms import blacklist, whitelist
+
 from schematics.types.serializable import serializable
 from zope.interface import implementer
-from openprocurement.api.models import (
-    Model,
-    ListType
-)
 
-from openprocurement.api.utils import calculate_business_date
-from openprocurement.api.models import (
-    get_now,
+from openprocurement.auctions.core.constants import DGF_PLATFORM_LEGAL_DETAILS
+from openprocurement.auctions.core.models import (
+    Model,
+    ListType,
     Value,
     Period,
-    TZ,
-    SANDBOX_MODE
-)
-from openprocurement.auctions.core.models import (
     IAuction,
-    COMPLAINT_STAND_STILL_TIME,
     get_auction,
     dgfOrganization as Organization,
     auction_view_role,
 )
-from openprocurement.auctions.core.constants import DGF_PLATFORM_LEGAL_DETAILS
-from openprocurement.auctions.core.utils import rounding_shouldStartAfter_after_midnigth
+from openprocurement.auctions.core.utils import (
+    rounding_shouldStartAfter_after_midnigth,
+    AUCTIONS_COMPLAINT_STAND_STILL_TIME,
+    calculate_business_date,
+    SANDBOX_MODE,
+    get_now,
+    TZ,
+)
+
 from openprocurement.auctions.dgf.models import (
     DGFFinancialAssets as BaseAuction,
     Bid as BaseBid,
@@ -37,12 +38,12 @@ from openprocurement.auctions.dgf.models import (
     Administrator_role
 )
 
-from openprocurement.auctions.insider.utils import generate_auction_url, calc_auction_end_time
 from openprocurement.auctions.insider.constants import (
     DUTCH_PERIOD,
     QUICK_DUTCH_PERIOD,
     NUMBER_OF_STAGES
 )
+from openprocurement.auctions.insider.utils import generate_auction_url, calc_auction_end_time
 
 
 class AuctionAuctionPeriod(BaseAuctionPeriod):
@@ -205,18 +206,18 @@ class Auction(BaseAuction):
             if standStillEnds and last_award_status == 'unsuccessful':
                 checks.append(max(standStillEnds))
         if self.status.startswith('active'):
-            from openprocurement.api.utils import calculate_business_date
+            from openprocurement.auctions.core.utils import calculate_business_date
             for complaint in self.complaints:
                 if complaint.status == 'claim' and complaint.dateSubmitted:
-                    checks.append(calculate_business_date(complaint.dateSubmitted, COMPLAINT_STAND_STILL_TIME, self))
+                    checks.append(calculate_business_date(complaint.dateSubmitted, AUCTIONS_COMPLAINT_STAND_STILL_TIME, self))
                 elif complaint.status == 'answered' and complaint.dateAnswered:
-                    checks.append(calculate_business_date(complaint.dateAnswered, COMPLAINT_STAND_STILL_TIME, self))
+                    checks.append(calculate_business_date(complaint.dateAnswered, AUCTIONS_COMPLAINT_STAND_STILL_TIME, self))
             for award in self.awards:
                 for complaint in award.complaints:
                     if complaint.status == 'claim' and complaint.dateSubmitted:
-                        checks.append(calculate_business_date(complaint.dateSubmitted, COMPLAINT_STAND_STILL_TIME, self))
+                        checks.append(calculate_business_date(complaint.dateSubmitted, AUCTIONS_COMPLAINT_STAND_STILL_TIME, self))
                     elif complaint.status == 'answered' and complaint.dateAnswered:
-                        checks.append(calculate_business_date(complaint.dateAnswered, COMPLAINT_STAND_STILL_TIME, self))
+                        checks.append(calculate_business_date(complaint.dateAnswered, AUCTIONS_COMPLAINT_STAND_STILL_TIME, self))
         return min(checks).isoformat() if checks else None
 
 

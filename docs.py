@@ -5,12 +5,17 @@ from datetime import timedelta, datetime
 from uuid import uuid4
 from copy import deepcopy
 
-from openprocurement.api.models import get_now
-import openprocurement.auctions.insider.tests.base as base_test
-from openprocurement.auctions.dgf.tests.base import base_test_bids, test_financial_organization
-from openprocurement.auctions.flash.tests.base import PrefixedRequestClass
-from openprocurement.auctions.insider.tests.base import test_insider_auction_data as base_test_auction_data, BaseInsiderAuctionWebTest, test_procuringEntity
 from webtest import TestApp
+
+from openprocurement.auctions.core.utils import get_now
+
+from openprocurement.auctions.core.tests.base import PrefixedRequestClass
+
+from openprocurement.auctions.dgf.tests.base import base_test_bids, test_financial_organization
+
+import openprocurement.auctions.insider.tests.base as base_test
+from openprocurement.auctions.insider.tests.base import test_insider_auction_data as base_test_auction_data, BaseInsiderAuctionWebTest, test_procuringEntity
+
 
 now = datetime.now()
 

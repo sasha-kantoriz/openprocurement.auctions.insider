@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 from logging import getLogger
 from pkg_resources import get_distribution
-from openprocurement.api.models import get_now, TZ
-from openprocurement.api.utils import context_unpack
 
+from openprocurement.auctions.core.utils import (
+    context_unpack,
+    get_now,
+    TZ,
+)
 from openprocurement.auctions.core.models import AUCTION_STAND_STILL_TIME
+
 from openprocurement.auctions.insider.constants import (
     STAGE_TIMEDELTA,
-    SERVICE_TIMEDELTA,
     BESTBID_TIMEDELTA,
     SEALEDBID_TIMEDELTA,
     SERVICE_TIMEDELTA

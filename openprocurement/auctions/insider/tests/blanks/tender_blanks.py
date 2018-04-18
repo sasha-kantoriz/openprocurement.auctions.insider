@@ -4,7 +4,10 @@ from datetime import timedelta
 from iso8601 import parse_date
 import pytz
 
-from openprocurement.api.models import get_now, SANDBOX_MODE, TZ
+from openprocurement.auctions.core.tests.base import JSON_RENDERER_ERROR
+from openprocurement.auctions.core.utils import (
+    SANDBOX_MODE, TZ, get_now
+)
 
 # InsiderAuctionTest
 
@@ -55,8 +58,7 @@ def create_auction_invalid(self):
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['status'], 'error')
     self.assertEqual(response.json['errors'], [
-        {u'description': u'Expecting value: line 1 column 1 (char 0)',
-            u'location': u'body', u'name': u'data'}
+        JSON_RENDERER_ERROR
     ])
 
     response = self.app.post_json(request_path, 'data', status=422)
@@ -91,7 +93,7 @@ def create_auction_invalid(self):
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['status'], 'error')
     self.assertEqual(response.json['errors'], [
-        {u'description': u'Not implemented', u'location': u'data', u'name': u'procurementMethodType'}
+        {u'description': u'procurementMethodType is not implemented', u'location': u'body', u'name': u'data'}
     ])
 
     response = self.app.post_json(request_path, {'data': {'invalid_field': 'invalid_value', 'procurementMethodType': self.initial_data['procurementMethodType']}}, status=422)

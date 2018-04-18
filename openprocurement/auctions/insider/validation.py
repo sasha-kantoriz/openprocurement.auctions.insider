@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from openprocurement.api.models import get_now
+from openprocurement.auctions.core.utils import get_now
 from openprocurement.auctions.core.validation import (
     validate_patch_auction_data,
 )
 
 
-def validate_auction_auction_data(request):
+def validate_auction_auction_data(request, **kwargs):
     data = validate_patch_auction_data(request)
     auction = request.validated['auction']
     if auction.status != 'active.auction':

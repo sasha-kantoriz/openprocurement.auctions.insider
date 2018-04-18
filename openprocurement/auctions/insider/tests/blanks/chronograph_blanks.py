@@ -1,4 +1,5 @@
-from openprocurement.api.models import get_now
+# -*- coding: utf-8 -*-
+from openprocurement.auctions.core.utils import get_now
 
 # InsiderAuctionAuctionPeriodResourceTest
 
