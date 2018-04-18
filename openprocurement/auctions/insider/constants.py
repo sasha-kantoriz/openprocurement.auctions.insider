@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
 
+from openprocurement.auctions.core.utils import read_json
+
 DUTCH_PERIOD = timedelta(minutes=405)
 QUICK_DUTCH_PERIOD = timedelta(minutes=10)
 
@@ -19,3 +21,6 @@ VIEW_LOCATIONS = [
     "openprocurement.auctions.core.plugins",
 ]
 
+DEFAULT_PROCUREMENT_METHOD_TYPE = "exampleDGFInsider"
+PROCUREMENT_METHOD_TYPES = read_json("procurementMethodTypes.json")
+PROCUREMENT_METHOD_TYPES.append(DEFAULT_PROCUREMENT_METHOD_TYPE)

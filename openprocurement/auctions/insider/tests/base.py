@@ -14,6 +14,7 @@ from openprocurement.auctions.dgf.tests.base import (
     test_lots,
 )
 
+from openprocurement.auctions.insider.constants import DEFAULT_PROCUREMENT_METHOD_TYPE
 
 now = datetime.now()
 test_organization = deepcopy(test_financial_organization)
@@ -22,7 +23,7 @@ test_procuringEntity = test_organization.copy()
 test_insider_auction_data = deepcopy(test_financial_auction_data)
 
 
-test_insider_auction_data["procurementMethodType"] = "dgfInsider1"
+test_insider_auction_data["procurementMethodType"] = DEFAULT_PROCUREMENT_METHOD_TYPE
 del test_insider_auction_data['minimalStep']
 
 class BaseInsiderWebTest(BaseWebTest):
