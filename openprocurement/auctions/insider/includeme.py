@@ -1,3 +1,5 @@
+import logging
+
 from pyramid.interfaces import IRequest
 
 from openprocurement.auctions.core.includeme import IContentConfigurator
@@ -5,12 +7,17 @@ from openprocurement.auctions.core.includeme import IContentConfigurator
 from openprocurement.auctions.insider.models import DGFInsider, IInsiderAuction
 from openprocurement.auctions.insider.adapters import AuctionInsiderConfigurator
 from openprocurement.auctions.insider.constants import (
-    VIEW_LOCATIONS, PROCUREMENT_METHOD_TYPES
+    VIEW_LOCATIONS, DEFAULT_PROCUREMENT_METHOD_TYPE
 )
 
+LOGGER = logging.getLogger(__name__)
 
-def includeme(config):
-    for procurementMethodType in PROCUREMENT_METHOD_TYPES:
+
+def includeme(config, plugin_config=None):
+    procurement_method_types = plugin_config.get('aliases', [])
+    if plugin_config.get('use_default', False):
+        procurement_method_types.append(DEFAULT_PROCUREMENT_METHOD_TYPE)
+    for procurementMethodType in procurement_method_types:
         config.add_auction_procurementMethodType(DGFInsider,
                                                  procurementMethodType)
 
@@ -22,3 +29,5 @@ def includeme(config):
         (IInsiderAuction, IRequest),
         IContentConfigurator
     )
+
+    LOGGER.info("Included openprocurement.auctions.insider plugin", extra={'MESSAGE_ID': 'included_plugin'})
