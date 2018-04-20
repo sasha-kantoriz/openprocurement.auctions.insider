@@ -48,11 +48,16 @@ def from0to1(registry):
 
     request = Request(registry)
     root = Root(request)
+    pmtConfigurator = registry.pmtConfigurator
+    procurement_method_types = [
+        pmt for pmt in pmtConfigurator if pmtConfigurator[pmt] == "dgfInsider"
+    ]
 
     docs = []
     for i in results:
         auction = i.doc
-        changed = migrate_awarding2_to_awarding3(auction, registry.server_id, (auction['procurementMethodType']))
+
+        changed = migrate_awarding2_to_awarding3(auction, registry.server_id, procurement_method_types)
         if not changed:
             continue
         model = registry.auction_procurementMethodTypes.get(auction['procurementMethodType'])
