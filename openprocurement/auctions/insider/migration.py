@@ -5,7 +5,9 @@ from openprocurement.auctions.core.plugins.awarding.v3.migration import (
     migrate_awarding2_to_awarding3
 )
 from openprocurement.auctions.core.traversal import Root
-from openprocurement.auctions.core.utils import get_now, read_yaml, get_plugins
+from openprocurement.auctions.core.utils import (
+    get_now, read_yaml, get_plugins, get_procurement_method_types
+)
 
 LOGGER = logging.getLogger(__name__)
 SCHEMA_VERSION = 1
@@ -48,10 +50,7 @@ def from0to1(registry):
 
     request = Request(registry)
     root = Root(request)
-    pmtConfigurator = registry.pmtConfigurator
-    procurement_method_types = [
-        pmt for pmt in pmtConfigurator if pmtConfigurator[pmt] == "dgfInsider"
-    ]
+    procurement_method_types = get_procurement_method_types(registry, ('dgfInsider',))
 
     docs = []
     for i in results:
