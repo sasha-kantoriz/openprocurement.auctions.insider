@@ -5,8 +5,9 @@ from openprocurement.auctions.core.plugins.awarding.v3.migration import (
     migrate_awarding2_to_awarding3
 )
 from openprocurement.auctions.core.traversal import Root
-from openprocurement.auctions.core.utils import get_now
-
+from openprocurement.auctions.core.utils import (
+    get_now, read_yaml, get_plugins, get_procurement_method_types
+)
 
 LOGGER = logging.getLogger(__name__)
 SCHEMA_VERSION = 1
@@ -25,7 +26,8 @@ def set_db_schema_version(db, version):
 
 
 def migrate_data(registry, destination=None):
-    existing_plugins = ['auctions.insider' in registry.settings['plugins'].split(',')]
+    plugins_config = read_yaml(registry.settings.get('plugins'))
+    existing_plugins = get_plugins(plugins_config)
     if registry.settings.get('plugins') and not any(existing_plugins):
         return
     cur_version = get_db_schema_version(registry.db)
@@ -48,11 +50,13 @@ def from0to1(registry):
 
     request = Request(registry)
     root = Root(request)
+    procurement_method_types = get_procurement_method_types(registry, ('dgfInsider',))
 
     docs = []
     for i in results:
         auction = i.doc
-        changed = migrate_awarding2_to_awarding3(auction, registry.server_id, ('dgfInsider'))
+
+        changed = migrate_awarding2_to_awarding3(auction, registry.server_id, procurement_method_types)
         if not changed:
             continue
         model = registry.auction_procurementMethodTypes.get(auction['procurementMethodType'])
