@@ -8,7 +8,7 @@ entry_points = {
         'auctions.insider = openprocurement.auctions.insider.includeme:includeme'
     ],
     'openprocurement.api.migrations': [
-        'auctions = openprocurement.auctions.insider.migration:migrate_data'
+        'auctions.insider = openprocurement.auctions.insider.migration:migrate_data'
     ],
     'openprocurement.tests': [
         'auctions.insider = openprocurement.auctions.insider.tests.main:suite'

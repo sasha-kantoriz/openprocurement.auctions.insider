@@ -124,7 +124,8 @@ class Auction(BaseAuction):
             'Administrator': Administrator_role,
         }
 
-    procurementMethodType = StringType(default="dgfInsider")
+    _procedure_type = "dgfInsider"
+    procurementMethodType = StringType()
     bids = ListType(ModelType(Bid), default=list())  # A list of all the companies who entered submissions for the auction.
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
     auctionParameters = ModelType(AuctionParameters)
