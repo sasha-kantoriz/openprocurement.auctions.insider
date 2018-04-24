@@ -91,7 +91,9 @@ def from1to2(registry):
     for i in results:
         auction = i.doc
 
-        if auction['procurementMethodType'] != 'dgfInsider' or auction['status'] != 'active.awarded' or 'contracts' not in auction:
+        procurement_method_types = get_procurement_method_types(registry, ('dgfInsider',))
+
+        if auction['procurementMethodType'] not in procurement_method_types or auction['status'] != 'active.awarded' or 'contracts' not in auction:
             continue
         changed = False
         contract = filter(lambda x: x['status'] == 'pending', auction['contracts'])[0]
