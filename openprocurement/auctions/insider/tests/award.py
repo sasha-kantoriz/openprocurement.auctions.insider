@@ -14,19 +14,19 @@ from openprocurement.auctions.core.utils import get_now
 
 from openprocurement.auctions.insider.tests.base import (
     BaseInsiderAuctionWebTest,
-    test_financial_bids,
+    test_bids,
 )
 
 
 class InsiderAuctionCreateAwardTest(BaseInsiderAuctionWebTest, CreateAuctionAwardTestMixin):
     initial_status = 'active.qualification'
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
 
 
 class InsiderAuctionAwardProcessTest(BaseInsiderAuctionWebTest, AuctionAwardProcessTestMixin):
     #initial_data = auction_data
     initial_status = 'active.auction'
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
     docservice = True
 
     def upload_auction_protocol(self, award):
@@ -122,7 +122,7 @@ class InsiderAuctionAwardProcessTest(BaseInsiderAuctionWebTest, AuctionAwardProc
 class InsiderAuctionAwardDocumentResourceTest(BaseInsiderAuctionWebTest,
                                               AuctionAwardDocumentResourceTestMixin):
     initial_status = 'active.auction'
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
 
     def setUp(self):
         super(InsiderAuctionAwardDocumentResourceTest, self).setUp()

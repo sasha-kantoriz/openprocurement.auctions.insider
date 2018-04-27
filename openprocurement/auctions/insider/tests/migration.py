@@ -4,7 +4,7 @@ from openprocurement.auctions.core.plugins.awarding.v3.tests.migration import (
     MigrateAwardingV2toV3Mixin
 )
 from openprocurement.auctions.insider.tests.base import (
-    test_financial_bids as test_bids
+    test_bids as test_bids
 )
 from openprocurement.auctions.insider.tests.base import (
     BaseInsiderAuctionWebTest,
@@ -15,7 +15,6 @@ from openprocurement.auctions.insider.migration import (
 )
 from openprocurement.auctions.insider.tests.blanks.migration_blanks import (
     migrate_pendingVerification_pending_one_bid,
-    migrate_pendingPayment_active_one_bid
 )
 
 
