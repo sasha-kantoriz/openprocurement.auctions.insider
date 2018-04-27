@@ -7,10 +7,7 @@ from openprocurement.auctions.core.utils import (
     remove_draft_bids,
     save_auction,
 )
-
-from openprocurement.auctions.dgf.views.financial.auction import (
-    FinancialAuctionAuctionResource,
-)
+from openprocurement.auctions.core.views.mixins import AuctionAuctionResource
 
 from openprocurement.auctions.insider.utils import invalidate_empty_bids, merge_auction_results
 from openprocurement.auctions.insider.validation import (
@@ -23,7 +20,7 @@ from openprocurement.auctions.insider.validation import (
             path='/auctions/{auction_id}/auction/{auction_lot_id}',
             auctionsprocurementMethodType="dgfInsider",
             description="Insider auction auction data")
-class InsiderAuctionAuctionResource(FinancialAuctionAuctionResource):
+class InsiderAuctionAuctionResource(AuctionAuctionResource):
 
     @json_view(permission='auction')
     def collection_get(self):
@@ -52,9 +49,18 @@ class InsiderAuctionAuctionResource(FinancialAuctionAuctionResource):
             return {'data': self.request.validated['auction'].serialize(self.request.validated['auction'].status)}
 
     @json_view(content_type="application/json", permission='auction', validators=(validate_auction_auction_data))
-    def collection_patch(self):
-        """Set urls for access to auction.
+    def post(self):
+        """Report auction results for lot.
         """
-        if apply_patch(self.request, src=self.request.validated['auction_src']):
-            self.LOGGER.info('Updated auction urls', extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_patch'}))
-            return {'data': self.request.validated['auction'].serialize("auction_view")}
+        apply_patch(self.request, save=False, src=self.request.validated['auction_src'])
+        auction = self.request.validated['auction']
+        if all([i.auctionPeriod and i.auctionPeriod.endDate for i in auction.lots if i.numberOfBids > 1 and i.status == 'active']):
+            cleanup_bids_for_cancelled_lots(auction)
+            invalidate_bids_under_threshold(auction)
+            if any([i.status == 'active' for i in auction.bids]):
+                self.request.content_configurator.start_awarding()
+            else:
+                auction.status = 'unsuccessful'
+        if save_auction(self.request):
+            self.LOGGER.info('Report auction results', extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_lot_auction_post'}))
+            return {'data': self.request.validated['auction'].serialize(self.request.validated['auction'].status)}

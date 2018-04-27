@@ -3,9 +3,7 @@
 from openprocurement.auctions.core.utils import (
     opresource,
 )
-from openprocurement.auctions.dgf.views.financial.cancellation_document import (
-    FinancialAuctionCancellationDocumentResource,
-)
+from openprocurement.auctions.core.views.mixins import AuctionCancellationDocumentResource
 
 
 @opresource(name='dgfInsider:Auction Cancellation Documents',
@@ -13,5 +11,5 @@ from openprocurement.auctions.dgf.views.financial.cancellation_document import (
             path='/auctions/{auction_id}/cancellations/{cancellation_id}/documents/{document_id}',
             auctionsprocurementMethodType="dgfInsider",
             description="Insider auction cancellation documents")
-class InsiderAuctionCancellationDocumentResource(FinancialAuctionCancellationDocumentResource):
+class InsiderAuctionCancellationDocumentResource(AuctionCancellationDocumentResource):
     pass
