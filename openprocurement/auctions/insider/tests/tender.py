@@ -18,7 +18,7 @@ from openprocurement.auctions.core.constants import DGF_ELIGIBILITY_CRITERIA
 from openprocurement.auctions.insider.models import DGFInsider
 from openprocurement.auctions.insider.tests.base import (
     test_insider_auction_data,
-    test_organization, test_financial_organization,
+    test_organization,
     BaseInsiderAuctionWebTest, BaseInsiderWebTest,
 )
 from openprocurement.auctions.insider.tests.blanks.tender_blanks import (
@@ -51,7 +51,7 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest, AuctionResourceTestMixin, D
     initial_data = test_insider_auction_data
     initial_organization = test_organization
     eligibility_criteria = DGF_ELIGIBILITY_CRITERIA
-    test_financial_organization = test_financial_organization
+    test_financial_organization = test_organization
 
     test_create_auction_invalid = snitch(create_auction_invalid)
     test_create_auction_auctionPeriod = snitch(create_auction_auctionPeriod)
@@ -61,7 +61,7 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest, AuctionResourceTestMixin, D
 
 class InsiderAuctionProcessTest(BaseInsiderAuctionWebTest):
 
-    test_financial_organization = test_financial_organization
+    test_financial_organization = test_organization
 
     #setUp = BaseInsiderWebTest.setUp
     def setUp(self):

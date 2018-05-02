@@ -1,22 +1,48 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
 
+from pyramid.security import Allow
 from schematics.exceptions import ValidationError
 from schematics.transforms import whitelist
-from schematics.types import StringType
+from schematics.types import StringType, BooleanType, IntType, DateType
 from schematics.types.compound import ModelType
 from schematics.types.serializable import serializable
 from zope.interface import implementer
 
-from openprocurement.auctions.core.constants import DGF_PLATFORM_LEGAL_DETAILS
+from openprocurement.auctions.core.constants import (
+    DGF_ELIGIBILITY_CRITERIA,
+    DGF_PLATFORM_LEGAL_DETAILS,
+    DGF_PLATFORM_LEGAL_DETAILS_FROM,
+    DGF_ID_REQUIRED_FROM,
+    DGF_DECISION_REQUIRED_FROM,
+)
 from openprocurement.auctions.core.models import (
+    Auction as BaseAuction,
+    dgfItem as Item,
+    dgfDocument as Document,
+    dgfComplaint as Complaint,
+    dgfCancellation as Cancellation,
+    dgf_auction_roles,
+    ComplaintModelType,
     Model,
     ListType,
     Value,
     Period,
     IAuction,
     get_auction,
-    dgfOrganization as Organization
+    Bid as BaseBid,
+    Feature,
+    Lot,
+    validate_features_uniq,
+    validate_lots_uniq,
+    validate_items_uniq,
+    validate_not_available
+)
+from openprocurement.auctions.core.plugins.awarding.v3.models import (
+    Award
+)
+from openprocurement.auctions.core.plugins.contracting.v3.models import (
+    Contract,
 )
 from openprocurement.auctions.core.utils import (
     rounding_shouldStartAfter_after_midnigth,
@@ -27,12 +53,6 @@ from openprocurement.auctions.core.utils import (
     TZ,
 )
 
-from openprocurement.auctions.dgf.models import (
-    DGFFinancialAssets as BaseAuction,
-    Bid as BaseBid,
-    AuctionAuctionPeriod as BaseAuctionPeriod,
-)
-
 from openprocurement.auctions.insider.constants import (
     DUTCH_PERIOD,
     QUICK_DUTCH_PERIOD,
@@ -41,7 +61,7 @@ from openprocurement.auctions.insider.constants import (
 from openprocurement.auctions.insider.utils import generate_auction_url, calc_auction_end_time
 
 
-class AuctionAuctionPeriod(BaseAuctionPeriod):
+class AuctionAuctionPeriod(Period):
     """The auction period."""
 
     @serializable(serialize_when_none=False)
@@ -66,13 +86,15 @@ class AuctionAuctionPeriod(BaseAuctionPeriod):
 
 
 class Bid(BaseBid):
-    tenderers = ListType(ModelType(Organization), required=True, min_size=1, max_size=1)
-
     class Options:
         roles = {
             'create': whitelist('tenderers', 'status', 'qualified', 'eligible'),
             'edit': whitelist('status', 'tenderers'),
         }
+
+    status = StringType(choices=['active', 'draft', 'invalid'], default='active')
+    qualified = BooleanType(required=True, choices=[True])
+    eligible = BooleanType(required=True, choices=[True])
 
     def validate_value(self, data, value):
         if isinstance(data['__parent__'], Model):
@@ -99,11 +121,40 @@ class IInsiderAuction(IAuction):
 @implementer(IInsiderAuction)
 class Auction(BaseAuction):
     """Data regarding auction process - publicly inviting prospective contractors to submit bids for evaluation and selecting a winner or winners."""
+    class Options:
+        roles = dgf_auction_roles
     _procedure_type = "dgfInsider"
-    procurementMethodType = StringType()
+    awards = ListType(ModelType(Award), default=list())
+    cancellations = ListType(ModelType(Cancellation), default=list())
+    complaints = ListType(ComplaintModelType(Complaint), default=list())
+    contracts = ListType(ModelType(Contract), default=list())
+    dgfID = StringType()
+    dgfDecisionID = StringType()
+    dgfDecisionDate = DateType()
+    documents = ListType(ModelType(Document), default=list())  # All documents and attachments related to the auction.
+    enquiryPeriod = ModelType(Period)  # The period during which enquiries may be made and will be answered.
+    tenderPeriod = ModelType(Period)  # The period when the auction is open for submissions. The end date is the closing date for auction submissions.
+    tenderAttempts = IntType(choices=[1, 2, 3, 4, 5, 6, 7, 8])
+    status = StringType(choices=['draft', 'active.tendering', 'active.auction', 'active.qualification', 'active.awarded', 'complete', 'cancelled', 'unsuccessful'], default='active.tendering')
+    features = ListType(ModelType(Feature), validators=[validate_features_uniq, validate_not_available])
+    lots = ListType(ModelType(Lot), default=list(), validators=[validate_lots_uniq, validate_not_available])
+    items = ListType(ModelType(Item), required=True, min_size=1, validators=[validate_items_uniq])
+    suspended = BooleanType()
+
     bids = ListType(ModelType(Bid), default=list())  # A list of all the companies who entered submissions for the auction.
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
-    minimalStep = ModelType(Value)
+    minimalStep = ModelType(Value, required=False)
+
+    eligibilityCriteria = StringType(default=DGF_ELIGIBILITY_CRITERIA['ua'])
+    eligibilityCriteria_en = StringType(default=DGF_ELIGIBILITY_CRITERIA['en'])
+    eligibilityCriteria_ru = StringType(default=DGF_ELIGIBILITY_CRITERIA['ru'])
+
+    def __acl__(self):
+        return [
+            (Allow, '{}_{}'.format(self.owner, self.owner_token), 'edit_auction'),
+            (Allow, '{}_{}'.format(self.owner, self.owner_token), 'edit_auction_award'),
+            (Allow, '{}_{}'.format(self.owner, self.owner_token), 'upload_auction_documents'),
+        ]
 
     def initialize(self):
         if not self.enquiryPeriod:
@@ -122,6 +173,30 @@ class Auction(BaseAuction):
         self.auctionPeriod.endDate = None
         self.date = now
         self.documents.append(type(self).documents.model_class(DGF_PLATFORM_LEGAL_DETAILS))
+
+    def validate_documents(self, data, docs):
+        if (data.get('revisions')[0].date if data.get('revisions') else get_now()) > DGF_PLATFORM_LEGAL_DETAILS_FROM and \
+                (docs and docs[0].documentType != 'x_dgfPlatformLegalDetails' or any([i.documentType == 'x_dgfPlatformLegalDetails' for i in docs[1:]])):
+            raise ValidationError(u"First document should be document with x_dgfPlatformLegalDetails documentType")
+
+    def validate_value(self, data, value):
+        if value.currency != u'UAH':
+            raise ValidationError(u"currency should be only UAH")
+
+    def validate_dgfID(self, data, dgfID):
+        if not dgfID:
+            if (data.get('revisions')[0].date if data.get('revisions') else get_now()) > DGF_ID_REQUIRED_FROM:
+                raise ValidationError(u'This field is required.')
+
+    def validate_dgfDecisionID(self, data, dgfID):
+        if not dgfID:
+            if (data.get('revisions')[0].date if data.get('revisions') else get_now()) > DGF_DECISION_REQUIRED_FROM:
+                raise ValidationError(u'This field is required.')
+
+    def validate_dgfDecisionDate(self, data, dgfID):
+        if not dgfID:
+            if (data.get('revisions')[0].date if data.get('revisions') else get_now()) > DGF_DECISION_REQUIRED_FROM:
+                raise ValidationError(u'This field is required.')
 
     @serializable(serialized_name="minimalStep", type=ModelType(Value))
     def auction_minimalStep(self):

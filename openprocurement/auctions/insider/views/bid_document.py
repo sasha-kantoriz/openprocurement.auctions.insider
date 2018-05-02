@@ -3,10 +3,7 @@ from openprocurement.auctions.core.utils import (
     get_now,
     opresource,
 )
-
-from openprocurement.auctions.dgf.views.financial.bid_document import (
-    FinancialAuctionBidDocumentResource,
-)
+from openprocurement.auctions.core.views.mixins import AuctionBidDocumentResource
 
 from openprocurement.auctions.insider.constants import TENDER_PERIOD_STATUSES
 
@@ -16,7 +13,7 @@ from openprocurement.auctions.insider.constants import TENDER_PERIOD_STATUSES
             path='/auctions/{auction_id}/bids/{bid_id}/documents/{document_id}',
             auctionsprocurementMethodType="dgfInsider",
             description="Insider auction bidder documents")
-class InsiderAuctionBidDocumentResource(FinancialAuctionBidDocumentResource):
+class InsiderAuctionBidDocumentResource(AuctionBidDocumentResource):
 
     def validate_bid_document(self, operation):
         auction = self.request.validated['auction']

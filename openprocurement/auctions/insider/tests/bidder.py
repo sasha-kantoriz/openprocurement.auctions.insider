@@ -7,8 +7,8 @@ from openprocurement.auctions.core.tests.bidder import (
 from openprocurement.auctions.core.tests.blanks.bidder_blanks import create_auction_bidder
 from openprocurement.auctions.core.tests.base import snitch
 from openprocurement.auctions.insider.tests.base import (
-    BaseInsiderAuctionWebTest, test_financial_bids,
-    test_insider_auction_data, test_financial_organization,
+    BaseInsiderAuctionWebTest,
+    test_organization,
 )
 from openprocurement.auctions.insider.tests.blanks.bidder_blanks import (
     # InsiderAuctionBidderResourceTest
@@ -28,7 +28,7 @@ from openprocurement.auctions.insider.tests.blanks.bidder_blanks import (
 
 class InsiderAuctionBidderResourceTest(BaseInsiderAuctionWebTest):
     initial_status = 'active.tendering'
-    test_financial_organization = test_financial_organization
+    test_financial_organization = test_organization
 
     test_create_auction_bidder_invalid = snitch(create_auction_bidder_invalid)
     test_create_auction_bidder = snitch(create_auction_bidder)

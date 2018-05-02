@@ -7,14 +7,14 @@ from copy import deepcopy
 
 from webtest import TestApp
 
+from openprocurement.auctions.core.tests.base import PrefixedRequestClass, base_test_bids
 from openprocurement.auctions.core.utils import get_now
 
-from openprocurement.auctions.core.tests.base import PrefixedRequestClass
-
-from openprocurement.auctions.dgf.tests.base import base_test_bids, test_financial_organization
-
 import openprocurement.auctions.insider.tests.base as base_test
-from openprocurement.auctions.insider.tests.base import test_insider_auction_data as base_test_auction_data, BaseInsiderAuctionWebTest, test_procuringEntity
+from openprocurement.auctions.insider.tests.base import (
+    test_insider_auction_data as base_test_auction_data,
+    BaseInsiderAuctionWebTest
+)
 
 
 now = datetime.now()
@@ -28,7 +28,7 @@ for i in base_test_bids:
     bid = deepcopy(i)
     bid.update({'eligible': True})
     bid.update({'qualified': True})
-    bid['tenderers'] = [test_financial_organization]
+    bid['tenderers'] = [base_test.test_organization]
     test_bids.append(bid)
 
 bid = {

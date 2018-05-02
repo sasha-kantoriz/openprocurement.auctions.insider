@@ -9,10 +9,7 @@ from openprocurement.auctions.core.utils import (
     set_ownership,
 )
 from openprocurement.auctions.core.validation import validate_bid_data, validate_patch_bid_data
-
-from openprocurement.auctions.dgf.views.financial.bid import (
-    FinancialAuctionBidResource,
-)
+from openprocurement.auctions.core.views.mixins import AuctionBidResource
 
 from openprocurement.auctions.insider.constants import TENDER_PERIOD_STATUSES
 
@@ -22,7 +19,7 @@ from openprocurement.auctions.insider.constants import TENDER_PERIOD_STATUSES
             path='/auctions/{auction_id}/bids/{bid_id}',
             auctionsprocurementMethodType="dgfInsider",
             description="Insider auction bids")
-class InsiderAuctionBidResource(FinancialAuctionBidResource):
+class InsiderAuctionBidResource(AuctionBidResource):
 
     @json_view(content_type="application/json", permission='create_bid', validators=(validate_bid_data,))
     def collection_post(self):
