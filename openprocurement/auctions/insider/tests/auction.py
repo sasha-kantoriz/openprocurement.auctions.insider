@@ -8,9 +8,8 @@ from openprocurement.auctions.core.tests.blanks.auction_blanks import (
 )
 from openprocurement.auctions.insider.tests.base import (
     BaseInsiderAuctionWebTest,
+    test_bids,
     test_organization,
-    test_financial_bids,
-    test_financial_organization,
     test_insider_auction_data
 )
 from openprocurement.auctions.insider.tests.blanks.auction_blanks import (
@@ -35,7 +34,7 @@ from openprocurement.auctions.insider.tests.blanks.auction_blanks import (
 
 class InsiderAuctionAuctionResourceTest(BaseInsiderAuctionWebTest):
     initial_status = 'active.tendering'
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
 
     test_get_auction_auction_not_found = snitch(get_auction_auction_not_found)
     test_get_auction_auction = snitch(get_auction_auction)
@@ -87,7 +86,7 @@ class InsiderAuctionSameValueAuctionResourceTest(BaseInsiderAuctionWebTest):
     initial_bids = [
         {
             "tenderers": [
-                test_financial_organization
+                test_organization
             ],
             'qualified': True,
             'eligible': True

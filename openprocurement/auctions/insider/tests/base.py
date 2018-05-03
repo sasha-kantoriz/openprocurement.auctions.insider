@@ -3,31 +3,66 @@ import os
 from datetime import datetime, timedelta
 from copy import deepcopy
 
+from openprocurement.auctions.core.tests.base import (
+    BaseWebTest,
+    BaseAuctionWebTest,
+    test_organization as base_test_organization,
+    test_auction_data, base_test_bids
+)
 from openprocurement.auctions.core.utils import apply_data_patch
 
-from openprocurement.auctions.dgf.tests.base import (
-    BaseWebTest,
-    BaseFinancialAuctionWebTest,
-    test_financial_organization,
-    test_financial_auction_data,
-    test_financial_auction_data_with_schema,
-    test_financial_bids,
-    schema_properties,
-    test_lots,
-)
 
 from openprocurement.auctions.insider.constants import DEFAULT_PROCUREMENT_METHOD_TYPE
 
 now = datetime.now()
-test_organization = deepcopy(test_financial_organization)
-test_procuringEntity = test_organization.copy()
+test_insider_auction_data = deepcopy(test_auction_data)
 
-test_insider_auction_data = deepcopy(test_financial_auction_data)
-test_insider_auction_data_with_schema = deepcopy(test_financial_auction_data_with_schema)
+schema_properties = {
+    "code": "06000000-2",
+    "version": "001",
+    "properties": {
+        "region": "Вінницька область",
+        "district": "м.Вінниця",
+        "cadastral_number": "1",
+        "area": 1,
+        "forms_of_land_ownership": ["державна"],
+        "co_owners": False,
+        "availability_of_utilities": True,
+        "current_use": True
+   }
+ }
+
+test_insider_auction_data_with_schema = deepcopy(test_insider_auction_data)
+test_insider_auction_data_with_schema['items'][0]['classification']['id'] = schema_properties['code']
+test_insider_auction_data_with_schema['items'][0]['schema_properties'] = schema_properties
+
+test_organization = deepcopy(base_test_organization)
+test_organization['additionalIdentifiers'] = [{
+    "scheme": u"UA-FIN",
+    "id": u"А01 457213"
+}]
+
+test_bids = []
+for i in base_test_bids:
+    bid = deepcopy(i)
+    bid.update({'eligible': True})
+    bid.update({'qualified': True})
+    bid['tenderers'] = [test_organization]
+    test_bids.append(bid)
+
+test_lots = [
+    {
+        'title': 'lot title',
+        'description': 'lot description',
+        'value': test_auction_data['value'],
+        'minimalStep': test_auction_data['minimalStep'],
+    }
+]
 
 for data in test_insider_auction_data, test_insider_auction_data_with_schema:
     data["procurementMethodType"] = DEFAULT_PROCUREMENT_METHOD_TYPE
     del data['minimalStep']
+
 
 class BaseInsiderWebTest(BaseWebTest):
 
@@ -39,7 +74,7 @@ class BaseInsiderWebTest(BaseWebTest):
     relative_to = os.path.dirname(__file__)
 
 
-class BaseInsiderAuctionWebTest(BaseFinancialAuctionWebTest):
+class BaseInsiderAuctionWebTest(BaseAuctionWebTest):
     relative_to = os.path.dirname(__file__)
     initial_data = test_insider_auction_data
     initial_organization = test_organization

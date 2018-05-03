@@ -23,7 +23,7 @@ from openprocurement.auctions.core.constants import DGF_ELIGIBILITY_CRITERIA
 from openprocurement.auctions.insider.models import DGFInsider
 from openprocurement.auctions.insider.tests.base import (
     test_insider_auction_data,
-    test_organization, test_financial_organization,
+    test_organization,
     BaseInsiderAuctionWebTest, BaseInsiderWebTest,
     test_insider_auction_data_with_schema, test_insider_auction_data_with_schema,
 )
@@ -58,7 +58,7 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest, AuctionResourceTestMixin, D
     initial_data = test_insider_auction_data
     initial_organization = test_organization
     eligibility_criteria = DGF_ELIGIBILITY_CRITERIA
-    test_financial_organization = test_financial_organization
+    test_financial_organization = test_organization
 
     test_check_daylight_savings_timezone = snitch(check_daylight_savings_timezone)
     test_create_auction_invalid = snitch(create_auction_invalid)
@@ -68,7 +68,7 @@ class InsiderAuctionResourceTest(BaseInsiderWebTest, AuctionResourceTestMixin, D
 
 
 class InsiderAuctionProcessTest(BaseInsiderAuctionWebTest):
-    test_financial_organization = test_financial_organization
+    test_financial_organization = test_organization
 
     #setUp = BaseInsiderWebTest.setUp
     def setUp(self):

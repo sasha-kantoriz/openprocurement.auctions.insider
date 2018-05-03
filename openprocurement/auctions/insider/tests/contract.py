@@ -12,7 +12,7 @@ from openprocurement.auctions.core.plugins.contracting.v3.tests.contract import 
 from openprocurement.auctions.core.utils import get_now
 
 from openprocurement.auctions.insider.tests.base import (
-    BaseInsiderAuctionWebTest, test_financial_bids,
+    BaseInsiderAuctionWebTest, test_bids,
 )
 
 
@@ -22,7 +22,7 @@ class InsiderAuctionContractResourceTest(
     AuctionContractV3ResourceTestCaseMixin,
 ):
     initial_status = 'active.auction'
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
 
     def setUp(self):
         super(InsiderAuctionContractResourceTest, self).setUp()
@@ -83,7 +83,7 @@ class InsiderAuctionContractResourceTest(
 class InsiderAuctionContractDocumentResourceTest(BaseInsiderAuctionWebTest, AuctionContractDocumentResourceTestMixin):
     #initial_data = auction_data
     initial_status = 'active.auction'
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
 
     def setUp(self):
         super(InsiderAuctionContractDocumentResourceTest, self).setUp()

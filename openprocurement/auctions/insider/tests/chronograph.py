@@ -21,7 +21,7 @@ from openprocurement.auctions.core.plugins.awarding.v3.tests.blanks.chronograph_
 from openprocurement.auctions.core.utils import get_now
 
 from openprocurement.auctions.insider.tests.base import (
-    BaseInsiderAuctionWebTest, test_financial_bids,
+    BaseInsiderAuctionWebTest, test_bids,
 )
 from openprocurement.auctions.insider.tests.blanks.chronograph_blanks import (
     # InsiderAuctionAuctionPeriodResourceTest
@@ -31,13 +31,13 @@ from openprocurement.auctions.insider.tests.blanks.chronograph_blanks import (
 
 
 class InsiderAuctionSwitchAuctionResourceTest(BaseInsiderAuctionWebTest):
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
 
     test_switch_to_auction = snitch(switch_to_auction)
 
 
 class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
 
     test_set_auction_period = snitch(set_auction_period)
     test_reset_auction_period = snitch(reset_auction_period)
@@ -45,7 +45,7 @@ class InsiderAuctionAuctionPeriodResourceTest(BaseInsiderAuctionWebTest):
 
 class InsiderAuctionAwardSwitchResourceTest(BaseInsiderAuctionWebTest, AuctionAwardSwitchResourceTestMixin):
     initial_status = 'active.auction'
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
 
     def setUp(self):
         super(InsiderAuctionAwardSwitchResourceTest, self).setUp()
@@ -84,7 +84,7 @@ class InsiderAuctionAwardSwitchResourceTest(BaseInsiderAuctionWebTest, AuctionAw
 
 class InsiderAuctionAwardSwitch2ResourceTest(BaseInsiderAuctionWebTest):
     initial_status = 'active.auction'
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
 
     def setUp(self):
         super(InsiderAuctionAwardSwitch2ResourceTest, self).setUp()
@@ -126,7 +126,7 @@ class InsiderAuctionAwardSwitch2ResourceTest(BaseInsiderAuctionWebTest):
 
 
 class InsiderAuctionDontSwitchSuspendedAuction2ResourceTest(BaseInsiderAuctionWebTest):
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
 
     test_switch_suspended_auction_to_auction = snitch(switch_suspended_auction_to_auction)
 
@@ -134,7 +134,7 @@ class InsiderAuctionDontSwitchSuspendedAuction2ResourceTest(BaseInsiderAuctionWe
 class InsiderAuctionDontSwitchSuspendedAuctionResourceTest(BaseInsiderAuctionWebTest,
                                                            AuctionDontSwitchSuspendedAuctionResourceTestMixin):
     initial_status = 'active.auction'
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
 
     def setUp(self):
         super(InsiderAuctionDontSwitchSuspendedAuctionResourceTest, self).setUp()

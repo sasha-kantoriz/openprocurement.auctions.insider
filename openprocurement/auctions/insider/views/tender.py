@@ -9,8 +9,7 @@ from openprocurement.auctions.core.utils import (
 from openprocurement.auctions.core.validation import (
     validate_patch_auction_data,
 )
-
-from openprocurement.auctions.dgf.views.financial.tender import FinancialAuctionResource
+from openprocurement.auctions.core.views.mixins import AuctionResource
 
 from openprocurement.auctions.insider.utils import check_status
 
@@ -19,7 +18,8 @@ from openprocurement.auctions.insider.utils import check_status
             path='/auctions/{auction_id}',
             auctionsprocurementMethodType="dgfInsider",
             description="Open Contracting compatible data exchange format. See http://ocds.open-contracting.org/standard/r/master/#auction for more info")
-class InsiderAuctionResource(FinancialAuctionResource):
+class InsiderAuctionResource(AuctionResource):
+
     @json_view(content_type="application/json", validators=(validate_patch_auction_data,), permission='edit_auction')
     def patch(self):
         auction = self.context

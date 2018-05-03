@@ -2,8 +2,7 @@
 import unittest
 
 from openprocurement.auctions.insider.tests.base import (
-    BaseInsiderAuctionWebTest, test_financial_bids,
-    test_insider_auction_data, test_financial_organization,
+    BaseInsiderAuctionWebTest, test_bids,
 )
 from openprocurement.auctions.core.tests.cancellation import (
     AuctionCancellationResourceTestMixin,
@@ -14,7 +13,7 @@ from openprocurement.auctions.core.tests.cancellation import (
 class InsiderAuctionCancellationResourceTest(BaseInsiderAuctionWebTest,
                                              AuctionCancellationResourceTestMixin):
     initial_status = 'active.tendering'
-    initial_bids = test_financial_bids
+    initial_bids = test_bids
 
 
 class InsiderAuctionCancellationDocumentResourceTest(BaseInsiderAuctionWebTest,

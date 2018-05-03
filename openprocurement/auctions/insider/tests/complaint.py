@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from openprocurement.auctions.insider.tests.base import (
-    BaseInsiderAuctionWebTest, test_financial_bids,
-    test_insider_auction_data, test_financial_organization,
-)
-from openprocurement.auctions.core.tests.base import snitch
+from openprocurement.auctions.insider.tests.base import BaseInsiderAuctionWebTest
 from openprocurement.auctions.core.tests.complaint import (
     AuctionComplaintResourceTestMixin,
     InsiderAuctionComplaintDocumentResourceTestMixin
