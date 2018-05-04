@@ -1,13 +1,15 @@
 ---
 plugins:
-  auctions.core:
+  api:
     plugins:
-      auctions.insider:
+      auctions.core:
         plugins:
-          insider.migration:
-        aliases: []
-        use_default: true
-        migration: false
+          auctions.insider:
+            plugins:
+              insider.migration:
+            aliases: []
+            use_default: true
+            migration: false
 
 config:
   auth:
