@@ -26,6 +26,7 @@ from openprocurement.auctions.core.models import (
     dgfDocument as Document,
     dgfComplaint as Complaint,
     dgfCancellation as Cancellation,
+    AuctionParameters as BaseAuctionParameters,
     dgf_auction_roles,
     ComplaintModelType,
     Model,
@@ -118,8 +119,12 @@ class Bid(BaseBid):
             return url
 
 
-class AuctionParameters(Model):
-    """Configurable auction parameters"""
+class AuctionParameters(BaseAuctionParameters):
+    class Options:
+        roles = {
+            'create': whitelist('type', 'dutchSteps'),
+        }
+
     type = StringType(choices=['insider'], default='insider')
     dutchSteps = IntType(choices=[10, 20, 30, 40, 50, 60, 70, 80, 90, 99, 100], default=80)
 
