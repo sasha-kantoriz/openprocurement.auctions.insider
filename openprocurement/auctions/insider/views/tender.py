@@ -9,6 +9,7 @@ from openprocurement.auctions.core.utils import (
 from openprocurement.auctions.core.validation import (
     validate_patch_auction_data,
 )
+from openprocurement.auctions.core.interfaces import IAuctionManager
 from openprocurement.auctions.core.views.mixins import AuctionResource
 
 from openprocurement.auctions.insider.utils import check_status
@@ -22,6 +23,7 @@ class InsiderAuctionResource(AuctionResource):
 
     @json_view(content_type="application/json", validators=(validate_patch_auction_data,), permission='edit_auction')
     def patch(self):
+        self.request.registry.getAdapter(self.context, IAuctionManager).change_auction(self.request)
         auction = self.context
         if self.request.authenticated_role != 'Administrator' and auction.status in ['complete', 'unsuccessful',
                                                                                      'cancelled']:
