@@ -22,6 +22,8 @@ requires = [
     'openprocurement.auctions.dgf',
 ]
 
+test_requires = requires + []
+
 docs_requires = requires + [
     'sphinxcontrib-httpdomain',
 ]
@@ -45,7 +47,7 @@ setup(name='openprocurement.auctions.insider',
       namespace_packages=['openprocurement', 'openprocurement.auctions'],
       include_package_data=True,
       zip_safe=False,
-      extras_require={'docs': docs_requires},
+      extras_require={'docs': docs_requires, 'test': test_requires},
       install_requires=requires,
       entry_points=entry_points,
       )
